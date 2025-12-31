@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router"; 
+import React, { useState } from "react";
+import { Link } from "react-router";
+import { useQuery } from "@tanstack/react-query";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 const Biodatas = () => {
-  const [biodatas, setBiodatas] = useState([]);
+  const axiosSecure = useAxiosSecure();
   const [filtered, setFiltered] = useState([]);
   const [filters, setFilters] = useState({
     ageRange: [18, 40],
@@ -10,14 +12,13 @@ const Biodatas = () => {
     permanentDivision: "",
   });
 
-  useEffect(() => {
-    fetch("http://localhost:5000/biodatas")
-      .then((res) => res.json())
-      .then((data) => {
-        setBiodatas(data);
-        setFiltered(data.slice(0, 20)); // ✅ initially first 20
-      });
-  }, []);
+  const { data: biodatas = [], isLoading } = useQuery({
+    queryKey: ["biodatas"],
+    queryFn: async () => {
+      const res = await axiosSecure.get("/biodatas");
+      return res.data;
+    },
+  });
 
   const handleFilter = () => {
     const result = biodatas
@@ -44,6 +45,17 @@ const Biodatas = () => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
+
+  if (isLoading) {
+    return (
+      <div className="py-16 bg-pink-50 text-center w-full">
+        <p className="text-gray-500">Loading biodatas...</p>
+      </div>
+    );
+  }
+
+  // Initially 20 data: filtered state empty hole, biodatas slice show korbe
+  const displayData = filtered.length > 0 ? filtered : biodatas.slice(0, 20);
 
   return (
     <div className="flex gap-6 p-6 bg-pink-50 min-h-screen">
@@ -98,7 +110,7 @@ const Biodatas = () => {
 
       {/* Biodatas Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-        {filtered.map((b) => (
+        {displayData.map((b) => (
           <div
             key={b._id}
             className="bg-white p-4 rounded shadow flex flex-col items-center"

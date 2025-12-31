@@ -7,9 +7,9 @@ import { CheckoutForm } from "./CheckoutForm";
 import { FaCrown, FaRocket, FaHandshake } from "react-icons/fa";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { MdPostAdd } from "react-icons/md";
-import { AuthContext } from "../provider/AuthProvider";
 import axios from "axios";
 import { useNavigate } from "react-router";
+import { AuthContext } from "../context/AuthContext";
 const stripePromise = loadStripe(import.meta.env.VITE_publish_key); // Must be a valid publishable key
 
 Modal.setAppElement("#root");

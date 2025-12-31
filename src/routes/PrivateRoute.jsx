@@ -2,7 +2,7 @@ import React, { use } from 'react';
 
 import { Navigate, useLocation } from 'react-router';
 import Loading from '../pages/Loading';
-import { AuthContext } from '../provider/AuthProvider';
+import { AuthContext } from '../context/AuthContext';
 
 
 

@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router';
 
 import { FaGoogle } from "react-icons/fa";
 import { toast } from 'react-toastify';
-import { AuthContext } from '../../../provider/AuthProvider';
+import { AuthContext } from '../../../context/AuthContext';
 
 const Login = () => {
 

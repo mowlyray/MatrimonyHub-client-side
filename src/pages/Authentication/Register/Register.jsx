@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import image1 from '../../../assets/register-image1.jpg';
 import image2 from '../../../assets/register-image2.jpg'
 import { motion } from "framer-motion";
-import { AuthContext } from '../../../provider/AuthProvider';
+import { AuthContext } from '../../../context/AuthContext';
 
 
 

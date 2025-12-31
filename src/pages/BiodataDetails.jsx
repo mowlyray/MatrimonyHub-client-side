@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router"; // <-- make sure it's rea
 import { motion } from "framer-motion";
 import axios from "axios";
 import Swal from 'sweetalert2'
-import { AuthContext } from "../provider/AuthProvider";
+import { AuthContext } from "../context/AuthContext";
 
 export default function BiodataDetails() {
   const { id } = useParams(); // matches route /biodata/:id

@@ -1,8 +1,8 @@
 import { Link, NavLink, Outlet } from "react-router";
 import { LogOut } from "lucide-react";
-import { AuthContext } from "../provider/AuthProvider";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
+import { AuthContext } from "../context/AuthContext";
 
 
 const DashboardLayout = () => {

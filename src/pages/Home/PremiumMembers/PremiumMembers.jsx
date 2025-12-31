@@ -1,22 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router';
+import { useQuery } from '@tanstack/react-query';
+import useAxiosSecure from '../../../hooks/useAxiosSecure';
 
 const PremiumMembers = () => {
-  const [biodatas, setBiodatas] = useState([]);
   const [sortOrder, setSortOrder] = useState('asc');
-  const [loading, setLoading] = useState(true);
+  const axiosSecure = useAxiosSecure();
 
-  useEffect(() => {
-    setLoading(true);
-    fetch(`http://localhost:5000/api/premium-biodatas?sort=${sortOrder}`)
-      .then(res => res.json())
-      .then(data => {
-        setBiodatas(data);
-        setLoading(false);
-      });
-  }, [sortOrder]);
-  console.log(biodatas)
+  const { data: biodatas = [], isLoading: loading } = useQuery({
+    queryKey: ['premium-biodatas', sortOrder],
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `/api/premium-biodatas?sort=${sortOrder}`
+      );
+      return res.data;
+    },
+  });
 
+  console.log(biodatas);
   return (
 
     <div className='bg-[#FCE4EC]'>

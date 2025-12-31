@@ -2,8 +2,8 @@ import { useForm } from "react-hook-form";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { AuthContext } from "../provider/AuthProvider";
 import { useNavigate } from "react-router";
+import { AuthContext } from "../context/AuthContext";
 
 const divisions = ["Dhaka", "Chattagra", "Rangpur", "Barisal", "Khulna", "Mymensingh", "Sylhet"];
 const heights = ["4'5\"", "4'6\"", "5'0\"", "5'5\"", "6'0\""];
