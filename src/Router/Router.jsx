@@ -4,17 +4,16 @@ import {
 
 } from "react-router";
 import MainLayouts from '../layouts/MainLayouts';
-import Home from '../pages/Home';
+
 import ErrorPage from '../pages/ErrorPage';
 import Biodatas from '../pages/Biodatas';
 import AboutUs from '../pages/AboutUs';
 import ContactUs from '../pages/ContactUs';
 import AuthLayout from '../layouts/AuthLayout';
-import Login from '../pages/Login';
-import Register from '../pages/Register';
+
 import BiodataDetails from '../pages/BiodataDetails';
 import DashboardLayout from '../layouts/DashboardLayout';
-import PrivateRoute from '../provider/PrivateRoute';
+
 import EditBiodata from '../pages/EditBiodata';
 import ViewBioData from '../pages/ViewBioData';
 import ContactRequest from '../pages/ContactRequest';
@@ -25,6 +24,11 @@ import ApprovedPremium from '../pages/ApprovedPremium';
 import ApprovedContactRequest from '../pages/ApprovedContactRequest';
 import Payment from '../pages/Paymnet';
 import Payment1 from '../pages/Paymnet1';
+import Home from '../pages/Home/Home/Home';
+import Login from '../pages/Authentication/Login/Login';
+import Register from '../pages/Authentication/Register/Register';
+import PrivateRoute from '../routes/PrivateRoute';
+
 
 // import AdminRoute from '../layouts/AdminRoute';
 // import AdminDashboard from '../Dashboard/AdminDashboard';

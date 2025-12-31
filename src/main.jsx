@@ -7,7 +7,7 @@ import {
   
   RouterProvider,
 } from "react-router";
-import { router } from './Routes/Routes.jsx';
+import { router } from './Router/Router.jsx';
 import AuthProvider from './provider/AuthProvider.jsx';
 import { ToastContainer } from 'react-toastify';
 

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router';
-import logo from '../assets/logo.png';
-import facebookimg from '../assets/facebook.png';
-import githubimg from '../assets/github.png';
-import linkdinimg from '../assets/linkedIn.png';
+import logo from '../../../assets/logo.png';
+import facebookimg from '../../../assets/facebook.png';
+import githubimg from '../../../assets/github.png';
+import linkdinimg from '../../../assets/linkedIn.png';
 
 const Footer = () => {
   return (

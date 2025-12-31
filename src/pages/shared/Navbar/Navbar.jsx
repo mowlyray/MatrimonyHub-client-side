@@ -1,7 +1,7 @@
 import { use, useState } from 'react';
 import { Link, NavLink } from 'react-router';
-import logoimage from '../assets/logo.png';
-import { AuthContext } from '../provider/AuthProvider';
+import logoimage from '../../../assets/logo.png';
+import { AuthContext } from '../../../provider/AuthProvider';
 import { toast } from 'react-toastify';
 // import useUserRole from '../hooks/useUserRole';
 

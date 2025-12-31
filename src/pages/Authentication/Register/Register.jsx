@@ -1,11 +1,12 @@
 import React, { use, useState } from 'react';
-import { AuthContext } from '../provider/AuthProvider';
+
 import { Link, useLocation, useNavigate } from 'react-router';
 import { FaGoogle } from "react-icons/fa";
 import { toast } from 'react-toastify';
-import image1 from '../assets/register-image1.jpg';
-import image2 from '../assets/register-image2.jpg'
+import image1 from '../../../assets/register-image1.jpg';
+import image2 from '../../../assets/register-image2.jpg'
 import { motion } from "framer-motion";
+import { AuthContext } from '../../../provider/AuthProvider';
 
 
 

@@ -1,8 +1,8 @@
 import React from 'react';
-import Banner from '../components/Banner';
-import PremiumMembers from '../components/PremiumMembers';
-import HowItWorks from '../components/HowItWorks';
-import SuccessCounter from '../components/SuccessCounter';
+import Banner from '../Banner/Banner';
+import PremiumMembers from '../PremiumMembers/PremiumMembers';
+import HowItWorks from '../HowItWorks/HowItWorks';
+import SuccessCounter from '../SuccessCounter/SuccessCounter';
 
 
 

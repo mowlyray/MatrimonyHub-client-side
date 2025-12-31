@@ -1,8 +1,9 @@
 import React, { use, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
-import { AuthContext } from '../provider/AuthProvider';
+
 import { FaGoogle } from "react-icons/fa";
 import { toast } from 'react-toastify';
+import { AuthContext } from '../../../provider/AuthProvider';
 
 const Login = () => {
 
