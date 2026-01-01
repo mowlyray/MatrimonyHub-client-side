@@ -66,11 +66,7 @@ export const router = createBrowserRouter([
             path: '/contact',
             element:<ContactUs></ContactUs>
         },
-        // {
-        //     path: '/dashboard',
-        //     element:<Dashboard></Dashboard>
-        // },
-         {
+        {
             path: '/biodata/:id',
             element:<BiodataDetails></BiodataDetails>
         },
@@ -133,28 +129,8 @@ export const router = createBrowserRouter([
         Component:ApprovedContactRequest,
       },
       
-      // {
-      //   path: "admin-dashboard",
-      //   Component:<AdminRoute><AdminDashboard></AdminDashboard></AdminRoute>,
-      // },
     ]
   },
-  //  {
-  //   path: '/dashboard',
-  //   element: <AdminRoute><DashboardLayout /></AdminRoute>,
-  //   children: [
-  //     {
-  //       path: "admin-dashboard",
-  //       Component:<AdminDashboard></AdminDashboard>,
-  //     },
-  //     {
-  //       path: "manage-users",
-  //       Component:<ManageUsers></ManageUsers>,
-  //     },
-      
-  //   ]
-  // },
-  
   
   
 ]);
