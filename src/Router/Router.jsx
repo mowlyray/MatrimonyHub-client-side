@@ -13,26 +13,20 @@ import AuthLayout from '../layouts/AuthLayout';
 
 import BiodataDetails from '../pages/BiodataDetails';
 import DashboardLayout from '../layouts/DashboardLayout';
-
-import EditBiodata from '../pages/EditBiodata';
-import ViewBioData from '../pages/ViewBioData';
-import ContactRequest from '../pages/ContactRequest';
-import FavouriteBiodata from '../pages/FavouriteBiodata';
-import AdminDashBoard from '../pages/AdminDashBoard';
-import ManageUsers from '../pages/ManageUsers';
-import ApprovedPremium from '../pages/ApprovedPremium';
-import ApprovedContactRequest from '../pages/ApprovedContactRequest';
 import Payment from '../pages/Paymnet';
 import Payment1 from '../pages/Paymnet1';
 import Home from '../pages/Home/Home/Home';
 import Login from '../pages/Authentication/Login/Login';
 import Register from '../pages/Authentication/Register/Register';
 import PrivateRoute from '../routes/PrivateRoute';
-
-
-// import AdminRoute from '../layouts/AdminRoute';
-// import AdminDashboard from '../Dashboard/AdminDashboard';
-// import ManageUsers from '../Dashboard/ManageUsers';
+import EditBiodata from '../pages/userDashboard/EditBiodata';
+import ViewBiodata from '../pages/userDashboard/ViewBioData';
+import ContactRequest from '../pages/userDashboard/ContactRequest';
+import FavouriteBiodata from '../pages/userDashboard/FavouriteBiodata';
+import ManageUsers from '../pages/AdminDashboard/ManageUsers';
+import ApprovedPremium from '../pages/AdminDashboard/ApprovedPremium';
+import ApprovedContactRequest from '../pages/AdminDashboard/ApprovedContactRequest';
+import AdminDashboard from '../pages/AdminDashboard/AdminDashboard';
 
 
 export const router = createBrowserRouter([
@@ -100,7 +94,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "view-biodata",
-        Component:ViewBioData,
+        Component:ViewBiodata,
       },
       {
         path: "contacts",
@@ -112,7 +106,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "admindashboard",
-        Component:AdminDashBoard,
+        Component:AdminDashboard,
       },
       {
         path: "manageUsers",
