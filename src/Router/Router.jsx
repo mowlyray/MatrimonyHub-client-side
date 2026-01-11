@@ -45,7 +45,7 @@ export const router = createBrowserRouter([
             element:<Biodatas></Biodatas>
         },
         {
-            path: '/checkout',
+            path: '/checkout/:biodataId',
             element:<Payment></Payment>
         },
         {
@@ -62,7 +62,7 @@ export const router = createBrowserRouter([
         },
         {
             path: '/biodata/:id',
-            element:<BiodataDetails></BiodataDetails>
+            element:<PrivateRoute><BiodataDetails></BiodataDetails></PrivateRoute>
         },
 
     ]
