@@ -20,13 +20,13 @@ import Register from '../pages/Authentication/Register/Register';
 import PrivateRoute from '../routes/PrivateRoute';
 import EditBiodata from '../pages/userDashboard/EditBiodata';
 import ViewBiodata from '../pages/userDashboard/ViewBioData';
-import ContactRequest from '../pages/userDashboard/ContactRequest';
 import FavouriteBiodata from '../pages/userDashboard/FavouriteBiodata';
 import ManageUsers from '../pages/AdminDashboard/ManageUsers';
 import ApprovedPremium from '../pages/AdminDashboard/ApprovedPremium';
 import ApprovedContactRequest from '../pages/AdminDashboard/ApprovedContactRequest';
 import AdminDashboard from '../pages/AdminDashboard/AdminDashboard';
 import Payment from '../pages/payment/payment';
+import MyContactRequest from '../pages/userDashboard/MyContactRequest';
 
 
 export const router = createBrowserRouter([
@@ -97,8 +97,8 @@ export const router = createBrowserRouter([
         Component:ViewBiodata,
       },
       {
-        path: "contacts",
-        Component:ContactRequest,
+        path: "my-contact-requests",
+        Component:MyContactRequest,
       },
       {
         path: "favourites",

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -10,6 +10,8 @@ const CheckoutForm = () => {
   const { user } = useContext(AuthContext);
   const stripe = useStripe();
   const elements = useElements();
+  const navigate = useNavigate();
+
 
   const [clientSecret, setClientSecret] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -60,7 +62,10 @@ const CheckoutForm = () => {
         text: "Your contact request has been sent to admin",
         icon: "success",
         confirmButtonColor: "#ec4899",
-      });
+      })
+      .then(() => {
+        navigate("/dashboard/my-contact-requests");
+       });
     }
 
     setProcessing(false);

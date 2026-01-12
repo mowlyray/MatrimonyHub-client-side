@@ -29,7 +29,7 @@ const BiodataDetails = () => {
         );
 
         setBiodata(res.data.biodata);
-        setIsPremiumUser(res.data.isViewerPremium);
+        setIsPremiumUser(res.data.canSeeContact);
 
         // 2️⃣ Fetch similar biodata
         const allRes = await axios.get("http://localhost:5000/biodatas");

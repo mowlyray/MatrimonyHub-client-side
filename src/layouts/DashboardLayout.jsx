@@ -59,7 +59,7 @@ const DashboardLayout = () => {
           </NavLink>
 
           <NavLink
-            to="/dashboard/contacts"
+            to="/dashboard/my-contact-requests"
             className={({ isActive }) =>
               isActive
                 ? "text-[#AD1457] font-semibold"
