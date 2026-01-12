@@ -13,8 +13,7 @@ import AuthLayout from '../layouts/AuthLayout';
 
 import BiodataDetails from '../pages/BiodataDetails';
 import DashboardLayout from '../layouts/DashboardLayout';
-import Payment from '../pages/Paymnet';
-import Payment1 from '../pages/Paymnet1';
+// import Payment1 from '../pages/Paymnet1';
 import Home from '../pages/Home/Home/Home';
 import Login from '../pages/Authentication/Login/Login';
 import Register from '../pages/Authentication/Register/Register';
@@ -27,6 +26,7 @@ import ManageUsers from '../pages/AdminDashboard/ManageUsers';
 import ApprovedPremium from '../pages/AdminDashboard/ApprovedPremium';
 import ApprovedContactRequest from '../pages/AdminDashboard/ApprovedContactRequest';
 import AdminDashboard from '../pages/AdminDashboard/AdminDashboard';
+import Payment from '../pages/payment/payment';
 
 
 export const router = createBrowserRouter([
@@ -48,10 +48,10 @@ export const router = createBrowserRouter([
             path: '/checkout/:biodataId',
             element:<Payment></Payment>
         },
-        {
-            path: '/payment',
-            element:<Payment1></Payment1>
-        },
+        // {
+        //     path: '/payment',
+        //     element:<Payment1></Payment1>
+        // },
         {
             path: '/about',
             element:<AboutUs></AboutUs>
