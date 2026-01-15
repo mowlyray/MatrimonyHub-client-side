@@ -16,7 +16,6 @@ const EditBiodata = () => {
   const [loading, setLoading] = useState(false);
   const { user } = useContext(AuthContext);
   const [biodataId, setBiodataId] = useState(null);
-  const [idCount, setIdCount] = useState(null);
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
@@ -41,8 +40,6 @@ const EditBiodata = () => {
           ...data,
           userId: user.uid,
           email: user.email,
-          isPremium: "false",
-          biodataId: idCount,
         });
 
         if (res.status === 201 || res.status === 200) {
@@ -65,11 +62,10 @@ const EditBiodata = () => {
         const resAll = await fetch("http://localhost:5000/allbiodata");
         const allData = await resAll.json();
         // console.log(allData.length)
-        setIdCount(allData.length+1)
         const single = allData.find((b) => b.email === user.email);
         if (single) {
           setBiodataId(single);
-          reset(single); // ✅ this sets all default values automatically
+          reset(single); // this sets all default values automatically
         }
       } catch (err) {
         console.error("Error fetching biodata:", err);
