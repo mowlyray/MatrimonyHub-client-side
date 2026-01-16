@@ -12,9 +12,15 @@ const occupations = ["Student", "Engineer", "Doctor", "Teacher", "Business"];
 const races = ["Fair", "Dark", "Brown"];
 
 const EditBiodata = () => {
-  const { register, handleSubmit, reset } = useForm();
-  const [loading, setLoading] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
+
   const { user } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
   const [biodataId, setBiodataId] = useState(null);
   const navigate = useNavigate();
 
@@ -22,230 +28,181 @@ const EditBiodata = () => {
     setLoading(true);
     try {
       if (biodataId) {
-        // Update existing biodata
-        const res = await axios.put(`http://localhost:5000/api/biodata/${biodataId?._id}`, {
-          ...data,
-          userId: user.uid,
-          email: user.email,
-        });
+        const res = await axios.put(
+          `http://localhost:5000/api/biodata/${biodataId._id}`,
+          { ...data, userId: user.uid, email: user.email }
+        );
 
-        if (res.status === 200 && res.data.updateResult?.modifiedCount > 0) {
-          toast.success("✅ Biodata updated successfully");
+        if (res.data.updateResult?.modifiedCount > 0) {
+          toast.success("Biodata updated successfully");
         } else {
-          toast.info("ℹ️ No changes were made.");
+          toast.info("No changes were made");
         }
       } else {
-        // Create new biodata
-        const res = await axios.post("http://localhost:5000/api/biodata", {
+        await axios.post("http://localhost:5000/api/biodata", {
           ...data,
           userId: user.uid,
           email: user.email,
         });
 
-        if (res.status === 201 || res.status === 200) {
-          toast.success("✅ Biodata created successfully");
-          reset(); // reset form only on create
-          navigate("/dashboard/view-biodata");
-        }
+        toast.success("Biodata created successfully");
+        reset();
+        navigate("/dashboard/view-biodata");
       }
-    } catch (err) {
-      console.error("Save error:", err);
-      toast.error("❌ Error saving biodata");
+    } catch {
+      toast.error("Error saving biodata");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const resAll = await fetch("http://localhost:5000/allbiodata");
-        const allData = await resAll.json();
-        // console.log(allData.length)
-        const single = allData.find((b) => b.email === user.email);
-        if (single) {
-          setBiodataId(single);
-          reset(single); // this sets all default values automatically
-        }
-      } catch (err) {
-        console.error("Error fetching biodata:", err);
-      }
-    };
-
-    if (user.email) fetchData();
+    if (user?.email) {
+      fetch("http://localhost:5000/biodatas")
+        .then(res => res.json())
+        .then(data => {
+          const single = data.find(b => b.email === user.email);
+          if (single) {
+            setBiodataId(single);
+            reset(single);
+          }
+        });
+    }
   }, [user.email, reset]);
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white shadow-xl rounded-2xl border border-gray-200 ">
-      <h2 className="text-4xl font-bold text-center text-[#E91E63] mb-10">
-        {biodataId ? "✏️ Update Your Biodata" : "📝 Create Your Biodata"}
-      </h2>
+    <div className="min-h-screen px-4">
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-12 text-[16px]">
-        {/* Personal Information */}
-        <section>
-          <h3 className="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">
-            👤 Personal Information
-          </h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Biodata Type *</label>
-              <select {...register("biodataType")} required className="w-full px-4 py-2 border border-gray-300 rounded-md">
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-              </select>
+      <div className="max-w-4xl mx-auto animated-border rounded-3xl p-[2px]">
+        <div className="bg-white rounded-3xl p-10 shadow-2xl">
+
+          <h2 className="text-4xl font-semibold text-center text-pink-600 mb-12">
+            {biodataId ? "✏️ Update Your Biodata" : "📝 Create Your Biodata"}
+          </h2>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-14">
+
+            {/* 👤 PERSONAL INFO */}
+            <Section title="👤 Personal Information">
+              <Select register={register("biodataType")} options={["Male", "Female"]} placeholder="Select Gender" />
+              <Input register={register("name")} placeholder="Full Name" />
+              <Input register={register("profileImage")} placeholder="Profile Image URL" />
+              <Input register={register("dob")} type="date" />
+              <Select register={register("height")} options={heights} placeholder="Height" />
+              <Select register={register("weight")} options={weights} placeholder="Weight" />
+              <Input register={register("age")} type="number" placeholder="Age" />
+              <Select register={register("occupation")} options={occupations} placeholder="Occupation" />
+              <Select register={register("race")} options={races} placeholder="Skin Color" />
+              <Input register={register("fatherName")} placeholder="Father's Name" />
+              <Input register={register("motherName")} placeholder="Mother's Name" />
+            </Section>
+
+            {/* 📍 LOCATION */}
+            <Section title="📍 Location Information">
+              <Select register={register("permanentDivision")} options={divisions} placeholder="Permanent Division" />
+              <Select register={register("presentDivision")} options={divisions} placeholder="Present Division" />
+            </Section>
+
+            {/* 💕 PARTNER */}
+            <Section title="💕 Partner Preferences">
+              <Input register={register("expectedPartnerAge")} type="number" placeholder="Expected Partner Age" />
+              <Select register={register("expectedPartnerHeight")} options={heights} placeholder="Expected Height" />
+              <Select register={register("expectedPartnerWeight")} options={weights} placeholder="Expected Weight" />
+            </Section>
+
+            {/* 📞 CONTACT */}
+            <Section title="📞 Contact Information">
+              <input value={user.email} readOnly className="input bg-gray-100" />
+
+              <div>
+                <input
+                  type="text"
+                  placeholder="Mobile Number (11 digits)"
+                  className="input"
+                  {...register("mobile", {
+                    required: "Mobile number is required",
+                    pattern: {
+                      value: /^[0-9]{11}$/,
+                      message: "Mobile number must be exactly 11 digits",
+                    },
+                  })}
+                />
+
+                {errors.mobile && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.mobile.message}
+                  </p>
+                )}
+              </div>
+            </Section>
+
+            {/* SUBMIT */}
+            <div className="text-center pt-8">
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-14 py-4 rounded-full text-white font-semibold text-lg
+                           bg-gradient-to-r from-pink-500 to-purple-600
+                           hover:scale-105 transition shadow-xl"
+              >
+                {loading ? "Saving..." : biodataId ? "Update Biodata" : "Save & Publish Now"}
+              </button>
             </div>
-
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Full Name *</label>
-              <input {...register("name")} required placeholder="Your Full Name"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md" />
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Profile Image Link *</label>
-              <input {...register("profileImage")} required placeholder="https://..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-md" />
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Date of Birth *</label>
-              <input type="date" {...register("dob")} required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md" />
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Height *</label>
-              <select {...register("height")} required className="w-full px-4 py-2 border border-gray-300 rounded-md">
-                <option value="">Select</option>
-                {heights.map(h => <option key={h}>{h}</option>)}
-              </select>
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Weight *</label>
-              <select {...register("weight")} required className="w-full px-4 py-2 border border-gray-300 rounded-md">
-                <option value="">Select</option>
-                {weights.map(w => <option key={w}>{w}</option>)}
-              </select>
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Age *</label>
-              <input type="number" {...register("age")} required placeholder="Age"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md" />
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Occupation *</label>
-              <select {...register("occupation")} required className="w-full px-4 py-2 border border-gray-300 rounded-md">
-                <option value="">Select</option>
-                {occupations.map(o => <option key={o}>{o}</option>)}
-              </select>
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Skin Color *</label>
-              <select {...register("race")} required className="w-full px-4 py-2 border border-gray-300 rounded-md">
-                <option value="">Select</option>
-                {races.map(r => <option key={r}>{r}</option>)}
-              </select>
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Father's Name *</label>
-              <input {...register("fatherName")} required className="w-full px-4 py-2 border border-gray-300 rounded-md" />
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Mother's Name *</label>
-              <input {...register("motherName")} required className="w-full px-4 py-2 border border-gray-300 rounded-md" />
-            </div>
-          </div>
-        </section>
-
-        {/* Location */}
-        <section>
-          <h3 className="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">📍 Location</h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Permanent Division *</label>
-              <select {...register("permanentDivision")} required className="w-full px-4 py-2 border border-gray-300 rounded-md">
-                <option value="">Select</option>
-                {divisions.map(d => <option key={d}>{d}</option>)}
-              </select>
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Present Division *</label>
-              <select {...register("presentDivision")} required className="w-full px-4 py-2 border border-gray-300 rounded-md">
-                <option value="">Select</option>
-                {divisions.map(d => <option key={d}>{d}</option>)}
-              </select>
-            </div>
-          </div>
-        </section>
-
-        {/* Partner Preferences */}
-        <section>
-          <h3 className="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">💞 Partner Preferences</h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Expected Partner Age *</label>
-              <input type="number" {...register("expectedPartnerAge")} required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md" />
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Expected Partner Height *</label>
-              <select {...register("expectedPartnerHeight")} required className="w-full px-4 py-2 border border-gray-300 rounded-md">
-                <option value="">Select</option>
-                {heights.map(h => <option key={h}>{h}</option>)}
-              </select>
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Expected Partner Weight *</label>
-              <select {...register("expectedPartnerWeight")} required className="w-full px-4 py-2 border border-gray-300 rounded-md">
-                <option value="">Select</option>
-                {weights.map(w => <option key={w}>{w}</option>)}
-              </select>
-            </div>
-          </div>
-        </section>
-
-        {/* Contact Info */}
-        <section>
-          <h3 className="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">📞 Contact Info</h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Email</label>
-              <input value={user.email} readOnly
-                className="w-full px-4 py-2 border border-gray-200 rounded-md bg-gray-100" />
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium text-gray-700">Mobile Number *</label>
-              <input {...register("mobile")} required placeholder="01XXXXXXXXX"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md" />
-            </div>
-          </div>
-        </section>
-
-        {/* Submit Button */}
-        <div className="text-center pt-6">
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-[#E91E63] hover:bg-[#AD1457] text-white font-bold px-12 py-3 rounded-full transition duration-300 shadow-lg"
-          >
-            {loading ? "Saving..." : (biodataId ? "💾 Update Biodata" : "💾 Save & Publish Now")}
-          </button>
+          </form>
         </div>
-      </form>
+      </div>
+
+      <style>{`
+        .animated-border {
+          background: linear-gradient(270deg, #ec4899, #8b5cf6, #f472b6);
+          background-size: 600% 600%;
+          animation: borderGlow 5s ease infinite;
+        }
+
+        @keyframes borderGlow {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        .input {
+          width: 100%;
+          padding: 12px 16px;
+          border-radius: 12px;
+          border: 1px solid #e5e7eb;
+          outline: none;
+          transition: all 0.3s;
+        }
+
+        .input:focus {
+          border-color: #ec4899;
+          box-shadow: 0 0 0 3px rgba(236,72,153,0.25);
+        }
+      `}</style>
     </div>
   );
 };
+
+/* ===== Helper Components ===== */
+
+const Section = ({ title, children }) => (
+  <div className="bg-white rounded-2xl p-6 shadow-md border grid md:grid-cols-2 gap-6">
+    <h3 className="md:col-span-2 text-xl font-semibold text-gray-700 mb-2 border-b pb-2">
+      {title}
+    </h3>
+    {children}
+  </div>
+);
+
+const Input = ({ register, placeholder, type = "text" }) => (
+  <input {...register} required type={type} placeholder={placeholder} className="input" />
+);
+
+const Select = ({ register, options, placeholder }) => (
+  <select {...register} required className="input">
+    <option value="">{placeholder}</option>
+    {options.map(opt => <option key={opt}>{opt}</option>)}
+  </select>
+);
 
 export default EditBiodata;
