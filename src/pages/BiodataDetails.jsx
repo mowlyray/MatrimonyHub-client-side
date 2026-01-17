@@ -6,33 +6,42 @@ import Swal from "sweetalert2";
 import { AuthContext } from "../context/AuthContext";
 
 const BiodataDetails = () => {
-  const { id } = useParams(); // /biodata/:id
+  const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
 
   const [biodata, setBiodata] = useState(null);
   const [similarBiodata, setSimilarBiodata] = useState([]);
-  const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [canSeeContact, setCanSeeContact] = useState(false);
+  const [isFavourite, setIsFavourite] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // ============================
-  // Fetch biodata details (SECURE)
-  // ============================
   useEffect(() => {
     const fetchBiodataDetails = async () => {
       try {
         setLoading(true);
 
-        // 1️⃣ Get biodata details (server decides contact visibility)
+        // biodata details
         const res = await axios.get(
           `http://localhost:5000/api/biodata/details/${id}?email=${user?.email}`
         );
 
         setBiodata(res.data.biodata);
-        setIsPremiumUser(res.data.canSeeContact);
+        setCanSeeContact(res.data.canSeeContact);
 
-        // 2️⃣ Fetch similar biodata
+        // check favourites
+        const favRes = await axios.get(
+          `http://localhost:5000/favouritebio/${user.email}`
+        );
+
+        const exists = favRes.data.find(
+          (f) => f.biodataId === res.data.biodata.biodataId
+        );
+        if (exists) setIsFavourite(true);
+
+        // fetch similar biodata
         const allRes = await axios.get("http://localhost:5000/biodatas");
+
         const similar = allRes.data
           .filter(
             (b) =>
@@ -42,8 +51,8 @@ const BiodataDetails = () => {
           .slice(0, 3);
 
         setSimilarBiodata(similar);
-      } catch (error) {
-        console.error("Failed to load biodata:", error);
+      } catch (err) {
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -54,9 +63,6 @@ const BiodataDetails = () => {
     }
   }, [id, user?.email]);
 
-  // ============================
-  // Add to favourites
-  // ============================
   const handleAddToFavourites = async () => {
     try {
       await axios.post("http://localhost:5000/favouritebio", {
@@ -68,14 +74,20 @@ const BiodataDetails = () => {
       });
 
       Swal.fire("Success!", "Added to favourites", "success");
+      setIsFavourite(true);
+
+      setTimeout(() => {
+        navigate("/dashboard/favourites");
+      }, 1200);
     } catch (err) {
-      Swal.fire("Error", "Already added or failed", "error");
+      Swal.fire(
+        "Info",
+        err.response?.data?.message || "Already added",
+        "info"
+      );
     }
   };
 
-  // ============================
-  // Request contact info
-  // ============================
   const handleRequestContact = () => {
     navigate(`/checkout/${biodata.biodataId}`);
   };
@@ -88,9 +100,12 @@ const BiodataDetails = () => {
     return <p className="text-center py-10">Biodata not found</p>;
   }
 
+  // 🔹 NEW: check own biodata
+  const isOwnBiodata = biodata?.email === user?.email;
+
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* ================= Biodata Details ================= */}
+      {/* Main Biodata */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
@@ -105,18 +120,22 @@ const BiodataDetails = () => {
           />
 
           <h2 className="text-2xl font-bold text-center mb-4">
-            {biodata.name || `Biodata ${biodata.biodataId}`}
+            {biodata.name}
           </h2>
 
           <div className="space-y-2 text-gray-700">
             <p><b>Biodata ID:</b> {biodata.biodataId}</p>
             <p><b>Type:</b> {biodata.biodataType}</p>
             <p><b>Age:</b> {biodata.age}</p>
+            <p><b>Height:</b> {biodata.height}</p>
+            <p><b>Weight:</b> {biodata.weight}</p>
             <p><b>Occupation:</b> {biodata.occupation}</p>
             <p><b>Permanent Division:</b> {biodata.permanentDivision}</p>
+            <p><b>Present Division:</b> {biodata.presentDivision}</p>
+            <p><b>Father's Name:</b> {biodata.fatherName}</p>
+            <p><b>Mother's Name:</b> {biodata.motherName}</p>
 
-            {/* Contact info */}
-            {isPremiumUser ? (
+            {canSeeContact ? (
               <>
                 <p><b>Email:</b> {biodata.email}</p>
                 <p><b>Mobile:</b> {biodata.mobile}</p>
@@ -128,16 +147,25 @@ const BiodataDetails = () => {
             )}
           </div>
 
-          {/* Buttons */}
+          {/* 🔹 Buttons */}
           <div className="flex flex-wrap justify-center gap-3 mt-6">
-            <button
-              onClick={handleAddToFavourites}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Add to Favourites
-            </button>
+            {/* Add to favourites – only if NOT own biodata */}
+            {!isOwnBiodata && (
+              <button
+                onClick={handleAddToFavourites}
+                disabled={isFavourite}
+                className={`px-4 py-2 rounded text-white ${
+                  isFavourite
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700"
+                }`}
+              >
+                {isFavourite ? "Added to Favourites" : "Add to Favourites"}
+              </button>
+            )}
 
-            {!isPremiumUser && (
+            {/* Request contact – only if NOT own biodata & NOT premium */}
+            {!isOwnBiodata && !canSeeContact && (
               <button
                 onClick={handleRequestContact}
                 className="px-4 py-2 border rounded hover:bg-gray-100"
@@ -149,29 +177,44 @@ const BiodataDetails = () => {
         </div>
       </motion.div>
 
-      {/* ================= Similar Biodata ================= */}
+      {/* Similar Biodata */}
       {similarBiodata.length > 0 && (
-        <div className="mt-12">
-          <h3 className="text-xl font-semibold mb-4">Similar Biodata</h3>
+        <div className="max-w-5xl mx-auto mt-14">
+          <h3 className="text-2xl font-bold mb-6 text-center">
+            Similar {biodata.biodataType} Biodata
+          </h3>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {similarBiodata.map((bio) => (
-              <motion.div
-                key={bio._id}
-                whileHover={{ scale: 1.03 }}
-                className="bg-white p-4 rounded-xl shadow cursor-pointer"
-                onClick={() => navigate(`/biodata/${bio._id}`)}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {similarBiodata.map((item) => (
+              <div
+                key={item._id}
+                className="bg-white p-4 rounded-xl shadow hover:shadow-lg transition"
               >
                 <img
-                  src={bio.profileImage}
-                  alt={bio.name}
-                  className="w-20 h-20 rounded-full object-cover mb-2"
+                  src={item.profileImage}
+                  alt={item.name}
+                  className="w-24 h-24 rounded-full mx-auto object-cover mb-3"
                 />
-                <h4 className="font-bold">{bio.name}</h4>
-                <p className="text-sm">{bio.occupation}</p>
-                <p className="text-sm">Age: {bio.age}</p>
-                <p className="text-sm">{bio.permanentDivision}</p>
-              </motion.div>
+
+                <h4 className="text-lg font-semibold text-center">
+                  {item.name}
+                </h4>
+
+                <div className="text-sm text-gray-600 text-center space-y-1 mt-2">
+                  <p><b>Age:</b> {item.age}</p>
+                  <p><b>Division:</b> {item.permanentDivision}</p>
+                  <p><b>Occupation:</b> {item.occupation}</p>
+                </div>
+
+                <div className="flex justify-center mt-4">
+                  <button
+                    onClick={() => navigate(`/biodata/${item._id}`)}
+                    className="px-4 py-1.5 bg-pink-600 text-white rounded hover:bg-pink-700"
+                  >
+                    View Profile
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         </div>
