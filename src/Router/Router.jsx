@@ -27,7 +27,7 @@ import ApprovedContactRequest from '../pages/AdminDashboard/ApprovedContactReque
 import AdminDashboard from '../pages/AdminDashboard/AdminDashboard';
 import Payment from '../pages/payment/payment';
 import MyContactRequest from '../pages/userDashboard/MyContactRequest';
-// import DashboardRedirect from '../layouts/DashboardRedirect';
+ import DashboardRedirect from '../layouts/DashboardRedirect';
 
 
 export const router = createBrowserRouter([
@@ -89,10 +89,10 @@ export const router = createBrowserRouter([
       <DashboardLayout></DashboardLayout>
     </PrivateRoute>,
     children: [
-      // {
-      // index: true,
-      // element: <DashboardRedirect />
-      // },
+      {
+      index: true,
+      element: <DashboardRedirect />
+      },
       {
         path: "edit-biodata",
         Component:EditBiodata,

@@ -1,33 +1,32 @@
-// import { useContext, useEffect, useState } from "react";
-// import { Navigate } from "react-router";
-// import axios from "axios";
-// import { AuthContext } from "../context/AuthContext";
+import { Navigate } from "react-router";
+import { useContext, useEffect, useState } from "react";
+import axios from "axios";
+import { AuthContext } from "../context/AuthContext";
 
-// const DashboardRedirect = () => {
-//   const { user } = useContext(AuthContext);
-//   const [role, setRole] = useState(null);
-//   const [loading, setLoading] = useState(true);
+const DashboardRedirect = () => {
+  const { user } = useContext(AuthContext);
+  const [role, setRole] = useState(null);
 
-//   useEffect(() => {
-//     if (!user?.email) return;
+  useEffect(() => {
+    if (!user?.email) return;
 
-//     axios
-//       .get(`http://localhost:5000/users/role?email=${user.email}`)
-//       .then(res => {
-//         setRole(res.data.role); // admin | user
-//       })
-//       .finally(() => setLoading(false));
-//   }, [user]);
+    axios.get("http://localhost:5000/biodatas")
+      .then(res => {
+        const match = res.data.find(b => b.email === user.email);
+        if (match?.Role === "admin") {
+          setRole("admin");
+        } else {
+          setRole("user");
+        }
+      });
+  }, [user]);
 
-//   if (loading) {
-//     return <div>Loading dashboard...</div>;
-//   }
+  if (!role) return null; // loading দেখাতে চাইলে দিতে পারো
 
-//   if (role === "admin") {
-//     return <Navigate to="/dashboard/admindashboard" replace />;
-//   }
+  // এখানেই magic
+  return role === "admin"
+    ? <Navigate to="/dashboard/admindashboard" replace />
+    : <Navigate to="/dashboard/edit-biodata" replace />;
+};
 
-//   return <Navigate to="/dashboard/edit-biodata" replace />;
-// };
-
-// export default DashboardRedirect;
+export default DashboardRedirect;
