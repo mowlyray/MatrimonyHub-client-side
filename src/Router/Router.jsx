@@ -28,6 +28,8 @@ import AdminDashboard from '../pages/AdminDashboard/AdminDashboard';
 import Payment from '../pages/payment/payment';
 import MyContactRequest from '../pages/userDashboard/MyContactRequest';
  import DashboardRedirect from '../layouts/DashboardRedirect';
+import GotMarried from '../pages/userDashboard/GotMarried';
+import AdminSuccessStories from '../pages/AdminDashboard/AdminSuccessStories';
 
 
 export const router = createBrowserRouter([
@@ -49,10 +51,6 @@ export const router = createBrowserRouter([
             path: '/checkout/:biodataId',
             element:<Payment></Payment>
         },
-        // {
-        //     path: '/payment',
-        //     element:<Payment1></Payment1>
-        // },
         {
             path: '/about',
             element:<AboutUs></AboutUs>
@@ -110,6 +108,11 @@ export const router = createBrowserRouter([
         Component:FavouriteBiodata,
       },
       {
+        path: "got-married",
+        Component:GotMarried,
+      },
+      
+      {
         path: "admindashboard",
         Component:AdminDashboard,
       },
@@ -127,6 +130,10 @@ export const router = createBrowserRouter([
         path: "approvedContactRequest",
         Component:ApprovedContactRequest,
       },
+      {
+        path: "success-stories",
+        Component: AdminSuccessStories,
+      }
       
     ]
   },

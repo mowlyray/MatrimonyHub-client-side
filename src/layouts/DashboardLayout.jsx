@@ -79,6 +79,16 @@ const DashboardLayout = () => {
           >
             ❤️ Favourites Biodata
           </NavLink>
+
+          <NavLink
+                to="/dashboard/got-married"
+                className={({ isActive }) =>
+                isActive ? "text-[#AD1457] font-semibold"
+                         : "text-gray-600 hover:text-[#E91E63]"
+                    }>
+                     💍 Got Married
+          </NavLink>
+
           </>}
           {user && role === 'admin' && <>
           <NavLink
@@ -122,6 +132,13 @@ const DashboardLayout = () => {
           >
           Approved Contact Request
           </NavLink>
+
+          <NavLink to="/dashboard/success-stories" className={({ isActive }) =>
+           isActive ? "text-[#AD1457] font-semibold"
+                    : "text-gray-600 hover:text-[#E91E63]" }>
+                   💍 Success Stories
+          </NavLink>
+
 
         </>}
 
