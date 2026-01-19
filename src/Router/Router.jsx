@@ -49,7 +49,7 @@ export const router = createBrowserRouter([
         },
         {
             path: '/checkout/:biodataId',
-            element:<Payment></Payment>
+            element:<PrivateRoute><Payment></Payment></PrivateRoute>
         },
         {
             path: '/about',

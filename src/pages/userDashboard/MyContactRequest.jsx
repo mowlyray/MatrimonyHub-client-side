@@ -1,24 +1,43 @@
-import React, { useContext, useEffect, useState } from "react";
-import axios from "axios";
+import React, { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Swal from "sweetalert2";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const MyContactRequest = () => {
   const { user } = useContext(AuthContext);
-  const [requests, setRequests] = useState([]);
+  const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!user) return;
+  /* =========================
+     LOAD CONTACT REQUESTS
+  ========================== */
+  const { data: requests = [] } = useQuery({
+    queryKey: ["my-contact-requests", user?.email],
+    enabled: !!user?.email,
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `/api/my-contact-requests/${user.email}`
+      );
+      return res.data;
+    },
+  });
 
-    axios
-      .get(`http://localhost:5000/api/my-contact-requests/${user.email}`)
-      .then((res) => setRequests(res.data));
-  }, [user]);
+  /* =========================
+     DELETE REQUEST
+  ========================== */
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      return axiosSecure.delete(`/api/contact-request/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["my-contact-requests", user.email]);
+      Swal.fire("Deleted", "Request removed", "success");
+    },
+  });
 
-  const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/api/contact-request/${id}`);
-    setRequests(requests.filter((r) => r._id !== id));
-    Swal.fire("Deleted", "Request removed", "success");
+  const handleDelete = (id) => {
+    deleteMutation.mutate(id);
   };
 
   return (
@@ -41,7 +60,13 @@ const MyContactRequest = () => {
             <tr key={r._id} className="text-center border-t">
               <td>{r.name || "N/A"}</td>
               <td>{r.biodataId}</td>
-              <td className={r.status === "approved" ? "text-green-600" : "text-orange-500"}>
+              <td
+                className={
+                  r.status === "approved"
+                    ? "text-green-600"
+                    : "text-orange-500"
+                }
+              >
                 {r.status}
               </td>
               <td>{r.status === "approved" ? r.mobile : "—"}</td>

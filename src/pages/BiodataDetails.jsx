@@ -1,71 +1,87 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useContext } from "react";
 import { useParams, useNavigate } from "react-router";
 import { motion } from "framer-motion";
-import axios from "axios";
 import Swal from "sweetalert2";
+import { useQuery } from "@tanstack/react-query";
 import { AuthContext } from "../context/AuthContext";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 const BiodataDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const axiosSecure = useAxiosSecure();
 
-  const [biodata, setBiodata] = useState(null);
-  const [similarBiodata, setSimilarBiodata] = useState([]);
-  const [canSeeContact, setCanSeeContact] = useState(false);
-  const [isFavourite, setIsFavourite] = useState(false);
-  const [loading, setLoading] = useState(true);
+  /* =========================
+     🔹 BIODATA DETAILS QUERY
+  ========================== */
+  const {
+    data: biodataRes,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["biodata-details", id, user?.email],
+    enabled: !!id && !!user?.email,
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `/api/biodata/details/${id}?email=${user.email}`
+      );
+      return res.data;
+    },
+  });
 
-  useEffect(() => {
-    const fetchBiodataDetails = async () => {
-      try {
-        setLoading(true);
+  /* =========================
+     🔹 FAVOURITES QUERY
+  ========================== */
+  const { data: favourites = [] } = useQuery({
+    queryKey: ["favourites", user?.email],
+    enabled: !!user?.email,
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/favouritebio/${user.email}`);
+      return res.data;
+    },
+  });
 
-        // biodata details
-        const res = await axios.get(
-          `http://localhost:5000/api/biodata/details/${id}?email=${user?.email}`
-        );
+  /* =========================
+     🔹 ALL BIODATAS (SIMILAR)
+  ========================== */
+  const { data: allBiodatas = [] } = useQuery({
+    queryKey: ["all-biodatas"],
+    queryFn: async () => {
+      const res = await axiosSecure.get("/biodatas");
+      return res.data;
+    },
+  });
 
-        setBiodata(res.data.biodata);
-        setCanSeeContact(res.data.canSeeContact);
+  if (isLoading) {
+    return <p className="text-center py-10">Loading biodata...</p>;
+  }
 
-        // check favourites
-        const favRes = await axios.get(
-          `http://localhost:5000/favouritebio/${user.email}`
-        );
+  if (error || !biodataRes?.biodata) {
+    return <p className="text-center py-10">Biodata not found</p>;
+  }
 
-        const exists = favRes.data.find(
-          (f) => f.biodataId === res.data.biodata.biodataId
-        );
-        if (exists) setIsFavourite(true);
+  const { biodata, canSeeContact } = biodataRes;
 
-        // fetch similar biodata
-        const allRes = await axios.get("http://localhost:5000/biodatas");
+  const isFavourite = favourites.find(
+    (f) => f.biodataId === biodata.biodataId
+  );
 
-        const similar = allRes.data
-          .filter(
-            (b) =>
-              b.biodataType === res.data.biodata.biodataType &&
-              b._id !== res.data.biodata._id
-          )
-          .slice(0, 3);
+  const similarBiodata = allBiodatas
+    .filter(
+      (b) =>
+        b.biodataType === biodata.biodataType && b._id !== biodata._id
+    )
+    .slice(0, 3);
 
-        setSimilarBiodata(similar);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const isOwnBiodata = biodata.email === user.email;
 
-    if (id && user?.email) {
-      fetchBiodataDetails();
-    }
-  }, [id, user?.email]);
-
+  /* =========================
+     🔹 ACTIONS
+  ========================== */
   const handleAddToFavourites = async () => {
     try {
-      await axios.post("http://localhost:5000/favouritebio", {
+      await axiosSecure.post("/favouritebio", {
         userEmail: user.email,
         biodataId: biodata.biodataId,
         name: biodata.name,
@@ -74,11 +90,7 @@ const BiodataDetails = () => {
       });
 
       Swal.fire("Success!", "Added to favourites", "success");
-      setIsFavourite(true);
-
-      setTimeout(() => {
-        navigate("/dashboard/favourites");
-      }, 1200);
+      setTimeout(() => navigate("/dashboard/favourites"), 1200);
     } catch (err) {
       Swal.fire(
         "Info",
@@ -92,20 +104,9 @@ const BiodataDetails = () => {
     navigate(`/checkout/${biodata.biodataId}`);
   };
 
-  if (loading) {
-    return <p className="text-center py-10">Loading biodata...</p>;
-  }
-
-  if (!biodata) {
-    return <p className="text-center py-10">Biodata not found</p>;
-  }
-
-  // 🔹 NEW: check own biodata
-  const isOwnBiodata = biodata?.email === user?.email;
-
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Main Biodata */}
+      {/* MAIN BIODATA */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
@@ -147,9 +148,7 @@ const BiodataDetails = () => {
             )}
           </div>
 
-          {/* 🔹 Buttons */}
           <div className="flex flex-wrap justify-center gap-3 mt-6">
-            {/* Add to favourites – only if NOT own biodata */}
             {!isOwnBiodata && (
               <button
                 onClick={handleAddToFavourites}
@@ -164,7 +163,6 @@ const BiodataDetails = () => {
               </button>
             )}
 
-            {/* Request contact – only if NOT own biodata & NOT premium */}
             {!isOwnBiodata && !canSeeContact && (
               <button
                 onClick={handleRequestContact}
@@ -177,7 +175,7 @@ const BiodataDetails = () => {
         </div>
       </motion.div>
 
-      {/* Similar Biodata */}
+      {/* SIMILAR BIODATA */}
       {similarBiodata.length > 0 && (
         <div className="max-w-5xl mx-auto mt-14">
           <h3 className="text-2xl font-bold mb-6 text-center">

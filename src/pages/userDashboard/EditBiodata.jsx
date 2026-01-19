@@ -1,9 +1,10 @@
 import { useForm } from "react-hook-form";
-import { useContext, useEffect, useState } from "react";
-import axios from "axios";
+import { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 import { AuthContext } from "../../context/AuthContext";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const divisions = ["Dhaka", "Chattagra", "Rangpur", "Barisal", "Khulna", "Mymensingh", "Sylhet"];
 const heights = ["4'5\"", "4'6\"", "5'0\"", "5'5\"", "6'0\""];
@@ -20,59 +21,72 @@ const EditBiodata = () => {
   } = useForm();
 
   const { user } = useContext(AuthContext);
-  const [loading, setLoading] = useState(false);
   const [biodataId, setBiodataId] = useState(null);
   const navigate = useNavigate();
+  const axiosSecure = useAxiosSecure();
 
-  const onSubmit = async (data) => {
-    setLoading(true);
-    try {
+  /* ===============================
+     LOAD USER BIODATA
+  =============================== */
+  const { isLoading } = useQuery({
+    queryKey: ["my-biodata", user?.email],
+    enabled: !!user?.email,
+    queryFn: async () => {
+      const res = await axiosSecure.get("/biodatas");
+      const single = res.data.find(b => b.email === user.email);
+      if (single) {
+        setBiodataId(single);
+        reset(single);
+      }
+      return single;
+    },
+  });
+
+  /* ===============================
+     CREATE / UPDATE BIODATA
+  =============================== */
+  const biodataMutation = useMutation({
+    mutationFn: async (formData) => {
       if (biodataId) {
-        const res = await axios.put(
-          `http://localhost:5000/api/biodata/${biodataId._id}`,
-          { ...data, userId: user.uid, email: user.email }
-        );
-
+        return axiosSecure.put(`/api/biodata/${biodataId._id}`, {
+          ...formData,
+          userId: user.uid,
+          email: user.email,
+        });
+      } else {
+        return axiosSecure.post("/api/biodata", {
+          ...formData,
+          userId: user.uid,
+          email: user.email,
+        });
+      }
+    },
+    onSuccess: (res) => {
+      if (biodataId) {
         if (res.data.updateResult?.modifiedCount > 0) {
           toast.success("Biodata updated successfully");
         } else {
           toast.info("No changes were made");
         }
       } else {
-        await axios.post("http://localhost:5000/api/biodata", {
-          ...data,
-          userId: user.uid,
-          email: user.email,
-        });
-
         toast.success("Biodata created successfully");
         reset();
         navigate("/dashboard/view-biodata");
       }
-    } catch {
+    },
+    onError: () => {
       toast.error("Error saving biodata");
-    } finally {
-      setLoading(false);
-    }
+    },
+  });
+
+  const onSubmit = (data) => {
+    biodataMutation.mutate(data);
   };
 
-  useEffect(() => {
-    if (user?.email) {
-      fetch("http://localhost:5000/biodatas")
-        .then(res => res.json())
-        .then(data => {
-          const single = data.find(b => b.email === user.email);
-          if (single) {
-            setBiodataId(single);
-            reset(single);
-          }
-        });
-    }
-  }, [user.email, reset]);
+  if (isLoading) return null;
 
   return (
     <div className="min-h-screen px-4">
-
       <div className="max-w-4xl mx-auto animated-border rounded-3xl p-[2px]">
         <div className="bg-white rounded-3xl p-10 shadow-2xl">
 
@@ -127,7 +141,6 @@ const EditBiodata = () => {
                     },
                   })}
                 />
-
                 {errors.mobile && (
                   <p className="text-red-500 text-sm mt-1">
                     {errors.mobile.message}
@@ -140,12 +153,16 @@ const EditBiodata = () => {
             <div className="text-center pt-8">
               <button
                 type="submit"
-                disabled={loading}
+                disabled={biodataMutation.isPending}
                 className="px-14 py-4 rounded-full text-white font-semibold text-lg
                            bg-gradient-to-r from-pink-500 to-purple-600
                            hover:scale-105 transition shadow-xl"
               >
-                {loading ? "Saving..." : biodataId ? "Update Biodata" : "Save & Publish Now"}
+                {biodataMutation.isPending
+                  ? "Saving..."
+                  : biodataId
+                  ? "Update Biodata"
+                  : "Save & Publish Now"}
               </button>
             </div>
           </form>
@@ -158,13 +175,11 @@ const EditBiodata = () => {
           background-size: 600% 600%;
           animation: borderGlow 5s ease infinite;
         }
-
         @keyframes borderGlow {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
         }
-
         .input {
           width: 100%;
           padding: 12px 16px;
@@ -173,7 +188,6 @@ const EditBiodata = () => {
           outline: none;
           transition: all 0.3s;
         }
-
         .input:focus {
           border-color: #ec4899;
           box-shadow: 0 0 0 3px rgba(236,72,153,0.25);

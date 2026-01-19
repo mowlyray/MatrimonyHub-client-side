@@ -1,53 +1,68 @@
-import { useContext, useEffect, useState } from "react";
-import axios from "axios";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import { Link } from "react-router";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const ViewBiodata = () => {
   const { user } = useContext(AuthContext);
+  const axiosSecure = useAxiosSecure();
 
-  const [biodata, setBiodata] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
-    if (user?.uid) {
-      axios
-        .get(`http://localhost:5000/api/biodata/user/${user.uid}`)
-        .then((res) => {
-          setBiodata(res.data);
-          setLoading(false);
-        })
-        .catch(() => {
-          setBiodata(null);
-          setLoading(false);
-        });
-    }
-  }, [user]);
-
-  const handleMakePremium = async () => {
-    try {
-      const res = await axios.patch(
-        `http://localhost:5000/api/biodata/request-premium/${biodata._id}`
+  /* =========================
+     LOAD BIODATA
+  ========================== */
+  const {
+    data: biodata,
+    isLoading,
+    setData,
+  } = useQuery({
+    queryKey: ["my-biodata", user?.uid],
+    enabled: !!user?.uid,
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `/api/biodata/user/${user.uid}`
       );
+      return res.data;
+    },
+  });
 
+  /* =========================
+     PREMIUM REQUEST
+  ========================== */
+  const premiumMutation = useMutation({
+    mutationFn: async () => {
+      return axiosSecure.patch(
+        `/api/biodata/request-premium/${biodata._id}`
+      );
+    },
+    onSuccess: (res) => {
       toast.success(res.data.message || "Premium request sent to admin");
 
-      // ✅ client-side state update
-      setBiodata({ ...biodata, premiumRequested: true });
+      // ✅ client-side update (same behavior as before)
+      setData?.((old) => ({
+        ...old,
+        premiumRequested: true,
+      }));
 
       setShowModal(false);
-    } catch (err) {
+    },
+    onError: (err) => {
       toast.info(err.response?.data?.message || "Request already sent");
       setShowModal(false);
-    }
+    },
+  });
+
+  const handleMakePremium = () => {
+    premiumMutation.mutate();
   };
 
   /* =========================
      LOADING STATE
   ========================== */
-  if (loading) {
+  if (isLoading) {
     return (
       <p className="text-center mt-20 text-gray-500 text-lg">
         Loading your biodata...

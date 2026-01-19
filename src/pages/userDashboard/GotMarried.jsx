@@ -1,41 +1,39 @@
 import { useForm } from "react-hook-form";
-import axios from "axios";
 import { useContext, useState } from "react";
 import { FaStar } from "react-icons/fa";
 import Swal from "sweetalert2";
-import { AuthContext } from './../../context/AuthContext';
+import { AuthContext } from "../../context/AuthContext";
+import { useMutation } from "@tanstack/react-query";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const GotMarried = () => {
   const { register, handleSubmit, reset, setValue } = useForm();
   const [rating, setRating] = useState(0);
   const { user } = useContext(AuthContext);
-
+  const axiosSecure = useAxiosSecure();
 
   const handleRating = (value) => {
     setRating(value);
     setValue("rating", value);
   };
 
-  const onSubmit = async (data) => {
-    try {
-      await axios.post("http://localhost:5000/api/success-story", {
-        ...data,
-        rating,
-        userEmail: user.email, 
-      });
-
-      // ✅ Success alert (center)
+  // 🔥 TANSTACK QUERY MUTATION
+  const { mutateAsync, isLoading } = useMutation({
+    mutationFn: async (storyData) => {
+      const res = await axiosSecure.post("/api/success-story", storyData);
+      return res.data;
+    },
+    onSuccess: () => {
       Swal.fire({
         icon: "success",
         title: "Success!",
         text: "Your success story has been submitted successfully. Please visit the Home page to see your story in the Success Stories section.",
         confirmButtonColor: "#ec4899",
       });
-
       reset();
       setRating(0);
-    } catch (error) {
-      // 🔒 already submitted case
+    },
+    onError: (error) => {
       if (error.response?.status === 400) {
         Swal.fire({
           icon: "info",
@@ -51,7 +49,15 @@ const GotMarried = () => {
           confirmButtonColor: "#ef4444",
         });
       }
-    }
+    },
+  });
+
+  const onSubmit = async (data) => {
+    await mutateAsync({
+      ...data,
+      rating,
+      userEmail: user.email, // 🔒 server verify করবে
+    });
   };
 
   return (
@@ -104,7 +110,7 @@ const GotMarried = () => {
 
         <button
           type="submit"
-          disabled={rating === 0}
+          disabled={rating === 0 || isLoading}
           className={`w-full py-3 rounded-full font-semibold text-lg transition
             ${
               rating === 0
@@ -113,7 +119,7 @@ const GotMarried = () => {
             }
           `}
         >
-          Submit Success Story
+          {isLoading ? "Submitting..." : "Submit Success Story"}
         </button>
       </form>
 

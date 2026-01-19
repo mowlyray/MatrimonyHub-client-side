@@ -1,22 +1,35 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 import Swal from "sweetalert2";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 export default function ApprovedPremium() {
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/admin/premium-requests")
-      .then((res) => {
-        setRequests(res.data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
+  // GET premium requests
+  const {
+    data: requests = [],
+    isLoading: loading,
+  } = useQuery({
+    queryKey: ["premiumRequests"],
+    queryFn: async () => {
+      const res = await axiosSecure.get("/api/admin/premium-requests");
+      return res.data;
+    },
+  });
 
-  const approve = async (id) => {
+  // APPROVE premium
+  const approveMutation = useMutation({
+    mutationFn: async (id) => {
+      return axiosSecure.patch(`/api/admin/approve-premium/${id}`);
+    },
+    onSuccess: () => {
+      Swal.fire("Approved!", "Biodata is now premium.", "success");
+      queryClient.invalidateQueries(["premiumRequests"]);
+    },
+  });
+
+  const approve = (id) => {
     Swal.fire({
       title: "Approve Premium?",
       text: "This biodata will be marked as premium",
@@ -24,16 +37,9 @@ export default function ApprovedPremium() {
       showCancelButton: true,
       confirmButtonText: "Yes, Make Premium",
       cancelButtonText: "Cancel",
-    }).then(async (result) => {
+    }).then((result) => {
       if (result.isConfirmed) {
-        await axios.patch(
-          `http://localhost:5000/api/admin/approve-premium/${id}`
-        );
-
-        Swal.fire("Approved!", "Biodata is now premium.", "success");
-
-        // remove from list
-        setRequests((prev) => prev.filter((r) => r._id !== id));
+        approveMutation.mutate(id);
       }
     });
   };
@@ -69,7 +75,9 @@ export default function ApprovedPremium() {
                 <th className="px-4 py-3 text-center font-semibold">
                   Biodata ID
                 </th>
-                <th className="px-4 py-3 text-center font-semibold">Action</th>
+                <th className="px-4 py-3 text-center font-semibold">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -80,11 +88,14 @@ export default function ApprovedPremium() {
                 >
                   <td className="px-4 py-3">{r.name}</td>
                   <td className="px-4 py-3">{r.email}</td>
-                  <td className="px-4 py-3 text-center">{r.biodataId}</td>
+                  <td className="px-4 py-3 text-center">
+                    {r.biodataId}
+                  </td>
                   <td className="px-4 py-3 text-center">
                     <button
                       onClick={() => approve(r._id)}
-                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-semibold"
+                      disabled={approveMutation.isPending}
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-semibold disabled:opacity-60"
                     >
                       Make Premium
                     </button>

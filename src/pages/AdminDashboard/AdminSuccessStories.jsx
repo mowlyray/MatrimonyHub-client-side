@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const AdminSuccessStories = () => {
-  const [stories, setStories] = useState([]);
+  const axiosSecure = useAxiosSecure();
   const [selectedStory, setSelectedStory] = useState(null);
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/admin/success-stories")
-      .then((res) => setStories(res.data));
-  }, []);
+  // GET success stories
+  const { data: stories = [] } = useQuery({
+    queryKey: ["adminSuccessStories"],
+    queryFn: async () => {
+      const res = await axiosSecure.get("/api/admin/success-stories");
+      return res.data;
+    },
+  });
 
   // 🔒 Disable background scroll when modal open
   useEffect(() => {
@@ -82,7 +86,6 @@ const AdminSuccessStories = () => {
               Marriage Success Story
             </h3>
 
-            {/* image same height, full visible */}
             <div className="w-full h-60 bg-gray-100 rounded-xl mb-4 flex items-center justify-center">
               <img
                 src={selectedStory.image}
@@ -98,7 +101,9 @@ const AdminSuccessStories = () => {
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-500">
                 Marriage Date:{" "}
-                {new Date(selectedStory.marriageDate).toLocaleDateString()}
+                {new Date(
+                  selectedStory.marriageDate
+                ).toLocaleDateString()}
               </p>
             </div>
           </div>

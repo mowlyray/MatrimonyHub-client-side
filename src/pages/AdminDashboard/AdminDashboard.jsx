@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 import {
   PieChart,
   Pie,
@@ -8,19 +6,23 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { useQuery } from "@tanstack/react-query";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const COLORS = ["#E91E63", "#42A5F5", "#EC407A", "#FBC02D", "#66BB6A"];
 
 const AdminDashboard = () => {
-  const [stats, setStats] = useState(null);
+  const axiosSecure = useAxiosSecure();
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/admin/stats")
-      .then((res) => setStats(res.data));
-  }, []);
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ["admin-stats"],
+    queryFn: async () => {
+      const res = await axiosSecure.get("/api/admin/stats");
+      return res.data;
+    },
+  });
 
-  if (!stats) return <p>Loading dashboard...</p>;
+  if (isLoading) return <p>Loading dashboard...</p>;
 
   const data = [
     { name: "Total Biodata", value: stats.totalBiodata },
@@ -53,7 +55,10 @@ const AdminDashboard = () => {
                 label
               >
                 {data.map((_, index) => (
-                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={index}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
               <Tooltip />

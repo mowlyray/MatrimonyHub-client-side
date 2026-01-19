@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 import { FaStar } from "react-icons/fa";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const SuccessStories = () => {
-  const [stories, setStories] = useState([]);
 
-  useEffect(() => {
-    axios.get("http://localhost:5000/api/success-story")
-      .then(res => setStories(res.data));
-  }, []);
+    const axiosSecure = useAxiosSecure();
+
+  const { data: stories = [] } = useQuery({
+    queryKey: ["successStories"],
+    queryFn: async () => {
+      const res = await axiosSecure.get("/api/success-story");
+      return res.data;
+    },
+  });
 
   return (
     <section className="py-16 bg-pink-50">
@@ -26,7 +30,7 @@ const SuccessStories = () => {
             />
 
             <p className="text-sm text-gray-500 mt-2">
-              Marriage Date: {story.marriageDate}
+              Marriage Date: {new Date(story.marriageDate).toLocaleDateString()}
             </p>
 
             <div className="flex text-yellow-500 mt-2">

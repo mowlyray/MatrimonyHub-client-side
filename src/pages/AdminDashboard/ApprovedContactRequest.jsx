@@ -1,33 +1,44 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
 import Swal from "sweetalert2";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const ApprovedContactRequest = () => {
-  const [requests, setRequests] = useState([]);
+  const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/contact-requests")
-      .then((res) => setRequests(res.data));
-  }, []);
+  // GET all contact requests
+  const { data: requests = [], isLoading } = useQuery({
+    queryKey: ["contactRequests"],
+    queryFn: async () => {
+      const res = await axiosSecure.get("/api/contact-requests");
+      return res.data;
+    },
+  });
 
-  const handleApprove = async (id) => {
-    await axios.patch(
-      `http://localhost:5000/api/contact-request/approve/${id}`
-    );
+  // APPROVE mutation
+  const approveMutation = useMutation({
+    mutationFn: async (id) => {
+      return axiosSecure.patch(`/api/contact-request/approve/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["contactRequests"]);
+      Swal.fire("Approved", "Contact request approved", "success");
+    },
+  });
 
-    setRequests(
-      requests.map((r) =>
-        r._id === id ? { ...r, status: "approved" } : r
-      )
-    );
-
-    Swal.fire("Approved", "Contact request approved", "success");
+  const handleApprove = (id) => {
+    approveMutation.mutate(id);
   };
+
+  if (isLoading) {
+    return <p className="text-center mt-10">Loading...</p>;
+  }
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Approved Contact Requests</h2>
+      <h2 className="text-2xl font-bold mb-4">
+        Approved Contact Requests
+      </h2>
 
       <table className="w-full border">
         <thead className="bg-green-100">
@@ -47,11 +58,14 @@ const ApprovedContactRequest = () => {
               <td>{r.biodataId}</td>
               <td>
                 {r.status === "approved" ? (
-                  <span className="text-green-600 font-semibold">Approved</span>
+                  <span className="text-green-600 font-semibold">
+                    Approved
+                  </span>
                 ) : (
                   <button
                     onClick={() => handleApprove(r._id)}
                     className="bg-green-500 text-white px-3 py-1 rounded"
+                    disabled={approveMutation.isPending}
                   >
                     Pending
                   </button>

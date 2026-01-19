@@ -1,9 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
-import axios from "axios";
 import Swal from "sweetalert2";
 import { AuthContext } from "../../context/AuthContext";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const CheckoutForm = () => {
   const { biodataId } = useParams();
@@ -11,21 +12,56 @@ const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
+  const axiosSecure = useAxiosSecure();
 
-
-  const [clientSecret, setClientSecret] = useState("");
   const [processing, setProcessing] = useState(false);
 
-  // Create payment intent
-  useEffect(() => {
-    axios
-      .post("http://localhost:5000/api/create-payment-intent", { amount: 5 })
-      .then((res) => setClientSecret(res.data.clientSecret));
-  }, []);
+  /* ===============================
+     CREATE PAYMENT INTENT (QUERY)
+  =============================== */
+  const { data, isLoading } = useQuery({
+    queryKey: ["create-payment-intent"],
+    queryFn: async () => {
+      const res = await axiosSecure.post("/api/create-payment-intent", {
+        amount: 5,
+      });
+      return res.data;
+    },
+    enabled: !!user,
+  });
 
+  const clientSecret = data?.clientSecret;
+
+  /* ===============================
+     CONTACT REQUEST (MUTATION)
+  =============================== */
+  const contactRequestMutation = useMutation({
+    mutationFn: async (paymentIntent) => {
+      return axiosSecure.post("/api/contact-request", {
+        biodataId,
+        requesterEmail: user.email,
+        paymentIntentId: paymentIntent.id,
+        amount: 5,
+      });
+    },
+    onSuccess: () => {
+      Swal.fire({
+        title: "Success 🎉",
+        text: "Your contact request has been sent to admin",
+        icon: "success",
+        confirmButtonColor: "#ec4899",
+      }).then(() => {
+        navigate("/dashboard/my-contact-requests");
+      });
+    },
+  });
+
+  /* ===============================
+     HANDLE SUBMIT
+  =============================== */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!stripe || !elements) return;
+    if (!stripe || !elements || !clientSecret) return;
 
     setProcessing(true);
 
@@ -50,26 +86,19 @@ const CheckoutForm = () => {
     }
 
     if (paymentIntent.status === "succeeded") {
-      await axios.post("http://localhost:5000/api/contact-request", {
-        biodataId,
-        requesterEmail: user.email,
-        paymentIntentId: paymentIntent.id,
-        amount: 5,
-      });
-
-      Swal.fire({
-        title: "Success 🎉",
-        text: "Your contact request has been sent to admin",
-        icon: "success",
-        confirmButtonColor: "#ec4899",
-      })
-      .then(() => {
-        navigate("/dashboard/my-contact-requests");
-       });
+      contactRequestMutation.mutate(paymentIntent);
     }
 
     setProcessing(false);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500">Preparing payment...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-rose-100 px-4">
@@ -101,7 +130,7 @@ const CheckoutForm = () => {
               Your Email
             </label>
             <input
-             value={user?.email || ""}
+              value={user?.email || ""}
               readOnly
               className="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-100 text-gray-600 focus:outline-none"
             />
@@ -113,17 +142,7 @@ const CheckoutForm = () => {
               Card Information
             </label>
             <div className="mt-1 p-3 border rounded-lg focus-within:ring-2 focus-within:ring-rose-400 transition">
-              <CardElement
-                options={{
-                  style: {
-                    base: {
-                      fontSize: "16px",
-                      color: "#374151",
-                      "::placeholder": { color: "#9ca3af" },
-                    },
-                  },
-                }}
-              />
+              <CardElement />
             </div>
           </div>
 

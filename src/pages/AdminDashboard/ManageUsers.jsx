@@ -1,39 +1,50 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import Swal from "sweetalert2";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const ManageUsers = () => {
-  const [users, setUsers] = useState([]);
-  const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
+  const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
 
-  // =========================
-  // FETCH USERS (SERVER SEARCH)
-  // =========================
-  const fetchUsers = async (searchText = "") => {
-    setLoading(true);
-    try {
-      const res = await axios.get(
-        `http://localhost:5000/biodatas?search=${searchText}`
+  const [search, setSearch] = useState("");
+
+  /* =========================
+     FETCH USERS (SERVER SEARCH)
+  ========================== */
+  const {
+    data: users = [],
+    isLoading,
+  } = useQuery({
+    queryKey: ["users", search],
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `/biodatas?search=${search}`
       );
 
-      // hide admins from list
-      const filtered = res.data.filter((u) => u.role !== "admin");
-      setUsers(filtered);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+      // hide admins
+      return res.data.filter((u) => u.role !== "admin");
+    },
+  });
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  /* =========================
+     MAKE ADMIN
+  ========================== */
+  const makeAdminMutation = useMutation({
+    mutationFn: async (id) => {
+      return axiosSecure.put(`/users/${id}`, {
+        role: "admin",
+      });
+    },
+    onSuccess: () => {
+      Swal.fire("Success", "User is now admin", "success");
+      queryClient.invalidateQueries(["users"]);
+    },
+    onError: () => {
+      Swal.fire("Error", "Failed to make admin", "error");
+    },
+  });
 
-  // =========================
-  // MAKE ADMIN
-  // =========================
   const makeAdmin = async (id) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
@@ -43,23 +54,29 @@ const ManageUsers = () => {
       confirmButtonText: "Yes, Make Admin",
     });
 
-    if (!confirm.isConfirmed) return;
-
-    try {
-      await axios.put(`http://localhost:5000/users/${id}`, {
-        role: "admin",
-      });
-
-      Swal.fire("Success", "User is now admin", "success");
-      fetchUsers(search);
-    } catch (err) {
-      Swal.fire("Error", "Failed to make admin", "error");
+    if (confirm.isConfirmed) {
+      makeAdminMutation.mutate(id);
     }
   };
 
-  // =========================
-  // MAKE PREMIUM
-  // =========================
+  /* =========================
+     MAKE PREMIUM
+  ========================== */
+  const makePremiumMutation = useMutation({
+    mutationFn: async (id) => {
+      return axiosSecure.patch(
+        `/api/admin/approve-premium/${id}`
+      );
+    },
+    onSuccess: () => {
+      Swal.fire("Success", "User is now premium", "success");
+      queryClient.invalidateQueries(["users"]);
+    },
+    onError: () => {
+      Swal.fire("Error", "Failed to approve premium", "error");
+    },
+  });
+
   const makePremium = async (id) => {
     const confirm = await Swal.fire({
       title: "Approve Premium?",
@@ -69,26 +86,17 @@ const ManageUsers = () => {
       confirmButtonText: "Yes, Approve",
     });
 
-    if (!confirm.isConfirmed) return;
-
-    try {
-      await axios.patch(
-        `http://localhost:5000/api/admin/approve-premium/${id}`
-      );
-
-      Swal.fire("Success", "User is now premium", "success");
-      fetchUsers(search);
-    } catch (err) {
-      Swal.fire("Error", "Failed to approve premium", "error");
+    if (confirm.isConfirmed) {
+      makePremiumMutation.mutate(id);
     }
   };
 
-  // =========================
-  // SEARCH
-  // =========================
+  /* =========================
+     SEARCH
+  ========================== */
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchUsers(search);
+    queryClient.invalidateQueries(["users"]);
   };
 
   return (
@@ -109,7 +117,7 @@ const ManageUsers = () => {
       </form>
 
       {/* TABLE */}
-      {loading ? (
+      {isLoading ? (
         <p>Loading...</p>
       ) : (
         <div className="bg-white rounded shadow overflow-x-auto">
@@ -126,7 +134,10 @@ const ManageUsers = () => {
             <tbody>
               {users.length === 0 && (
                 <tr>
-                  <td colSpan="4" className="p-4 text-center text-gray-500">
+                  <td
+                    colSpan="4"
+                    className="p-4 text-center text-gray-500"
+                  >
                     No users found
                   </td>
                 </tr>
@@ -151,7 +162,7 @@ const ManageUsers = () => {
                       </button>
                     )}
 
-                    {/* MAKE PREMIUM (ONLY REQUESTED) */}
+                    {/* MAKE PREMIUM */}
                     {u.premiumRequested && !u.isPremium && (
                       <button
                         onClick={() => makePremium(u._id)}
