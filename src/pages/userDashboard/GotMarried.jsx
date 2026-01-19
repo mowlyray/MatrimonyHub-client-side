@@ -1,12 +1,15 @@
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { FaStar } from "react-icons/fa";
 import Swal from "sweetalert2";
+import { AuthContext } from './../../context/AuthContext';
 
 const GotMarried = () => {
   const { register, handleSubmit, reset, setValue } = useForm();
   const [rating, setRating] = useState(0);
+  const { user } = useContext(AuthContext);
+
 
   const handleRating = (value) => {
     setRating(value);
@@ -18,6 +21,7 @@ const GotMarried = () => {
       await axios.post("http://localhost:5000/api/success-story", {
         ...data,
         rating,
+        userEmail: user.email, 
       });
 
       // ✅ Success alert (center)
