@@ -3,13 +3,11 @@ import { Link, NavLink } from 'react-router';
 import logoimage from '../../../assets/logo.png';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../../../context/AuthContext';
-// import useUserRole from '../hooks/useUserRole';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
    const {user,logOut} = use(AuthContext);
-  //  const { role } = useUserRole();
 
   const handleLogOut = () => {
     console.log("user trying to LogOut");
@@ -24,23 +22,23 @@ const Navbar = () => {
 
   const navLinkStyle = ({ isActive }) =>
     isActive
-      ? 'text-[#E91E63] font-semibold px-3 py-2 border-b-2 border-[#AD1457]'
-      : 'text-[#E91E63] hover:text-[#AD1457] font-medium px-3 py-2';
+      ? 'text-[#E91E63] font-semibold lg:text-[18px] md:text-[14px] px-3 py-2 border-b-2 border-[#AD1457]'
+      : 'text-[#E91E63] hover:text-[#AD1457] lg:text-[18px] md:text-[14px] lg:font-medium px-3 py-2';
 
   return (
     <nav className="bg-white p-1 border-b border-[#F8BBD0] shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Left: Logo and Name */}
-          <div className="flex items-center gap-0">
-            <img className='w-[50px] lg:w-[60px] mr-0' src={logoimage} alt="logo" />
-            <Link to="/" className="text-2xl font-bold text-[#E91E63]">
+          <div className="flex md:mr-4 items-center md:gap-0">
+            <img className='w-[40px] lg:w-[60px] mr-0' src={logoimage} alt="logo" />
+            <Link to="/" className="text-2xl lg:text-[25px] md:text-[20px] font-bold text-[#E91E63]">
               Matrimony<span className="text-[#AD1457]">Hub</span>
             </Link>
           </div>
 
           {/* Center: Nav Links (md and above) */}
-          <div className="hidden text-lg md:flex items-center gap-4">
+          <div className="hidden gap-2.5 text-lg md:flex items-center whitespace-nowrap">
             <NavLink to="/" className={navLinkStyle}>Home</NavLink>
             <NavLink to="/biodatas" className={navLinkStyle}>Biodatas</NavLink>
             <NavLink to="/about" className={navLinkStyle}>About Us</NavLink>
@@ -112,8 +110,8 @@ const Navbar = () => {
           <div className="md:hidden flex flex-col gap-2 py-4">
             <NavLink to="/" className={navLinkStyle}>Home</NavLink>
             <NavLink to="/biodatas" className={navLinkStyle}>Biodatas</NavLink>
-            <NavLink to="/about" className={navLinkStyle}>About Us</NavLink>
-            <NavLink to="/contact" className={navLinkStyle}>Contact Us</NavLink>
+            <NavLink to="/about" className={navLinkStyle}>AboutUs</NavLink>
+            <NavLink to="/contact" className={navLinkStyle}>ContactUs</NavLink>
             {user && <NavLink to="/dashboard" className={navLinkStyle}>Dashboard</NavLink>}
           </div>
         )}
