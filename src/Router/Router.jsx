@@ -30,6 +30,7 @@ import MyContactRequest from '../pages/userDashboard/MyContactRequest';
  import DashboardRedirect from '../layouts/DashboardRedirect';
 import GotMarried from '../pages/userDashboard/GotMarried';
 import AdminSuccessStories from '../pages/AdminDashboard/AdminSuccessStories';
+import AdminRoute from '../layouts/AdminRoute';
 
 
 export const router = createBrowserRouter([
@@ -111,11 +112,15 @@ export const router = createBrowserRouter([
         path: "got-married",
         Component:GotMarried,
       },
-      
       {
-        path: "admindashboard",
-        Component:AdminDashboard,
-      },
+      path: "admindashboard",
+      element: (
+        <AdminRoute>
+          <AdminDashboard />
+        </AdminRoute>
+      ),
+    },
+      
       {
         path: "manageUsers",
         Component:ManageUsers,

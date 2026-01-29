@@ -1,32 +1,38 @@
 import { Navigate } from "react-router";
-import { useContext, useEffect, useState } from "react";
-import axios from "axios";
+import { useContext, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { AuthContext } from "../context/AuthContext";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 const DashboardRedirect = () => {
   const { user } = useContext(AuthContext);
   const [role, setRole] = useState(null);
+  const axiosSecure = useAxiosSecure();
 
-  useEffect(() => {
-    if (!user?.email) return;
+  useQuery({
+    queryKey: ["dashboardRole", user?.email],
+    enabled: !!user?.email,
+    queryFn: async () => {
+      const res = await axiosSecure.get("/biodatas");
+      const match = res.data.find(
+        (b) => b.email === user.email
+      );
+      if (match?.Role === "admin") {
+        setRole("admin");
+      } else {
+        setRole("user");
+      }
+      return match?.Role;
+    },
+  });
 
-    axios.get("http://localhost:5000/biodatas")
-      .then(res => {
-        const match = res.data.find(b => b.email === user.email);
-        if (match?.Role === "admin") {
-          setRole("admin");
-        } else {
-          setRole("user");
-        }
-      });
-  }, [user]);
+  if (!role) return null; // loading চাইলে এখানে spinner দিতে পারো
 
-  if (!role) return null; // loading দেখাতে চাইলে দিতে পারো
-
-  // এখানেই magic
-  return role === "admin"
-    ? <Navigate to="/dashboard/admindashboard" replace />
-    : <Navigate to="/dashboard/edit-biodata" replace />;
+  return role === "admin" ? (
+    <Navigate to="/dashboard/admindashboard" replace />
+  ) : (
+    <Navigate to="/dashboard/edit-biodata" replace />
+  );
 };
 
 export default DashboardRedirect;

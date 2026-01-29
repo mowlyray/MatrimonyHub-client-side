@@ -1,24 +1,28 @@
+import { Navigate, useLocation } from "react-router";
+import { useContext } from "react";
+import useUserRole from "../hooks/useUserRole";
+import { AuthContext } from "../context/AuthContext";
 
-// import React, { use, useContext } from 'react';
-// import { Navigate, useLocation } from 'react-router';
+const AdminRoute = ({ children }) => {
+  const { user, loading } = useContext(AuthContext);
+  const { role, roleLoading } = useUserRole();
+  const location = useLocation();
 
-// import useUserRole from '../hooks/useUserRole';
-// import { AuthContext } from '../provider/AuthProvider';
+  if (loading || roleLoading) {
+    return <div className="text-center mt-10">Loading...</div>;
+  }
 
-// const AdminRoute = ({ children }) => {
-//   const { user, loading } = useContext(AuthContext);
-//   const { role, roleLoading } = useUserRole();
-//   const location = useLocation();
+  if (!user || role !== "admin") {
+    return (
+      <Navigate
+        to="/forbidden"
+        state={{ from: location.pathname }}
+        replace
+      />
+    );
+  }
 
-//   if (loading || roleLoading) {
-//     return <span className="loading loading-spinner loading-xl"></span>;
-//   }
+  return children;
+};
 
-//   if (!user || role !== 'admin') {
-//     return <Navigate to="/forbidden" state={{ from: location.pathname }} replace />;
-//   }
-
-//   return children;
-// };
-
-// export default AdminRoute;
+export default AdminRoute;

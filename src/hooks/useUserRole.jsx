@@ -1,28 +1,26 @@
-// import { use, useEffect, useState } from "react";
+import { useContext } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { AuthContext } from "../context/AuthContext";
+import useAxiosSecure from "./useAxiosSecure";
 
-// import { AuthContext } from "../provider/AuthProvider";
+const useUserRole = () => {
+  const { user } = useContext(AuthContext);
+  const axiosSecure = useAxiosSecure();
 
-// const useUserRole = () => {
-//   const { user } = use(AuthContext);
-//   const [role, setRole] = useState(null);
-//   const [roleLoading, setRoleLoading] = useState(true);
+  const { data, isLoading } = useQuery({
+    queryKey: ["userRole", user?.email],
+    enabled: !!user?.email,
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `/biodatas`
+      );
 
-//   useEffect(() => {
-//     if (user?.email) {
-//       fetch(`http://localhost:5000/users/role/${user.email}`)
-//         .then((res) => res.json())
-//         .then((data) => {
-//           setRole(data.role); // assuming backend returns: { role: "admin" }
-//           setRoleLoading(false);
-//         })
-//         .catch((err) => {
-//           console.error("Failed to fetch role", err);
-//           setRoleLoading(false);
-//         });
-//     }
-//   }, [user]);
+      const match = res.data.find(b => b.email === user.email);
+      return match?.Role || "user";
+    },
+  });
 
-//   return { role, roleLoading };
-// };
+  return { role: data, roleLoading: isLoading };
+};
 
-// export default useUserRole;
+export default useUserRole;
