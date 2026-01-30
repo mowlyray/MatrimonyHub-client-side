@@ -1,13 +1,18 @@
 import React, { useState } from "react";
 import { Link } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import useAxiosSecure from "../hooks/useAxiosSecure";
 
 const Biodatas = () => {
   const axiosSecure = useAxiosSecure();
+
+  const [ageSelect, setAgeSelect] = useState("18-25");
   const [filtered, setFiltered] = useState([]);
+  const [isFiltered, setIsFiltered] = useState(false);
+
   const [filters, setFilters] = useState({
-    ageRange: [18, 40],
+    ageRange: [18, 25],
     biodataType: "",
     permanentDivision: "",
   });
@@ -20,75 +25,102 @@ const Biodatas = () => {
     },
   });
 
-  const handleFilter = () => {
+  const applyFilterWith = (activeFilters) => {
     const result = biodatas
       .filter(
         (b) =>
-          b.age >= filters.ageRange[0] &&
-          b.age <= filters.ageRange[1] &&
-          (!filters.biodataType ||
-            b.biodataType.toLowerCase() === filters.biodataType.toLowerCase()) &&
-          (!filters.permanentDivision ||
-            b.permanentDivision === filters.permanentDivision)
+          b.age >= activeFilters.ageRange[0] &&
+          b.age <= activeFilters.ageRange[1] &&
+          (!activeFilters.biodataType ||
+            b.biodataType.toLowerCase() ===
+              activeFilters.biodataType.toLowerCase()) &&
+          (!activeFilters.permanentDivision ||
+            b.permanentDivision === activeFilters.permanentDivision)
       )
       .slice(0, 20);
 
     setFiltered(result);
   };
 
-  const handleAgeChange = (e) => {
-    const [min, max] = e.target.value.split("-").map(Number);
-    setFilters((prev) => ({ ...prev, ageRange: [min, max] }));
-  };
+  const handleFilter = () => {
+    const [min, max] = ageSelect.split("-").map(Number);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+    const updatedFilters = {
+      ...filters,
+      ageRange: [min, max],
+    };
+
+    setFilters(updatedFilters);
+    setIsFiltered(true);
+    applyFilterWith(updatedFilters);
   };
 
   if (isLoading) {
     return (
-      <div className="py-16 bg-pink-50 text-center w-full">
-        <p className="text-gray-500">Loading biodatas...</p>
+      <div className="py-24 bg-gradient-to-br from-rose-50 via-pink-50 to-white text-center">
+        <p className="text-gray-500 animate-pulse text-lg">
+          Loading biodatas...
+        </p>
       </div>
     );
   }
 
-  // Initially 20 data: filtered state empty hole, biodatas slice show korbe
-  const displayData = filtered.length > 0 ? filtered : biodatas.slice(0, 20);
+  const displayData = isFiltered ? filtered : biodatas.slice(0, 20);
 
   return (
-    <div className="flex gap-6 p-6 bg-pink-50 min-h-screen">
-      {/* Filter Sidebar */}
-      <div className="w-64 bg-white p-4 rounded shadow">
-        <h2 className="text-lg font-bold mb-4">Filter Biodatas</h2>
+    <div className="flex gap-8 p-8 bg-gradient-to-br from-rose-50 via-pink-50 to-white min-h-screen">
+      {/* 🔥 FILTER SIDEBAR */}
+      <motion.div
+        initial={{ x: -30, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="w-72 bg-white p-5 rounded-2xl shadow-lg border border-rose-200 h-fit"
+      >
+        <h2 className="text-xl font-bold mb-5 text-rose-600">
+          Filter Biodatas
+        </h2>
 
-        <label className="block mb-1">Age Range:</label>
+        <label className="block mb-1 font-medium text-gray-700">
+          Age Range
+        </label>
         <select
-          onChange={handleAgeChange}
-          className="mb-4 w-full p-1 border rounded"
+          value={ageSelect}
+          onChange={(e) => setAgeSelect(e.target.value)}
+          className="mb-4 w-full p-2 border rounded-lg focus:ring-2 focus:ring-rose-300"
         >
           <option value="18-25">18 - 25</option>
           <option value="26-35">26 - 35</option>
           <option value="36-45">36 - 45</option>
         </select>
 
-        <label className="block mb-1">Biodata Type:</label>
+        <label className="block mb-1 font-medium text-gray-700">
+          Biodata Type
+        </label>
         <select
-          name="biodataType"
-          onChange={handleChange}
-          className="mb-4 w-full p-1 border rounded"
+          onChange={(e) =>
+            setFilters((prev) => ({
+              ...prev,
+              biodataType: e.target.value,
+            }))
+          }
+          className="mb-4 w-full p-2 border rounded-lg focus:ring-2 focus:ring-rose-300"
         >
           <option value="">All</option>
           <option value="Male">Male</option>
           <option value="Female">Female</option>
         </select>
 
-        <label className="block mb-1">Division:</label>
+        <label className="block mb-1 font-medium text-gray-700">
+          Division
+        </label>
         <select
-          name="permanentDivision"
-          onChange={handleChange}
-          className="mb-4 w-full p-1 border rounded"
+          onChange={(e) =>
+            setFilters((prev) => ({
+              ...prev,
+              permanentDivision: e.target.value,
+            }))
+          }
+          className="mb-5 w-full p-2 border rounded-lg focus:ring-2 focus:ring-rose-300"
         >
           <option value="">All</option>
           <option value="Dhaka">Dhaka</option>
@@ -100,37 +132,66 @@ const Biodatas = () => {
           <option value="Mymensingh">Mymensingh</option>
         </select>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={handleFilter}
-          className="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 w-full rounded"
+          className="bg-gradient-to-r from-rose-500 to-pink-500
+                     text-white px-4 py-2 w-full rounded-lg font-semibold
+                     shadow-md hover:shadow-lg"
         >
           Apply Filter
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
-      {/* Biodatas Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-        {displayData.map((b) => (
-          <div
+      {/* 🔥 BIODATA CARDS */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+        {displayData.map((b, index) => (
+          <motion.div
             key={b._id}
-            className="bg-white p-4 rounded shadow flex flex-col items-center"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.45,
+              ease: "easeOut",
+              delay: index * 0.08,
+            }}
+            whileHover={{ scale: 1.04 }}
+            className="bg-white p-5 rounded-2xl shadow-md
+                       hover:shadow-xl border border-rose-200
+                       text-center transition-shadow"
           >
             <img
               src={b.profileImage}
               alt="Profile"
-              className="w-32 h-32 object-cover rounded-full mb-4"
+              className="w-32 h-32 object-cover rounded-full mx-auto mb-4
+                         border-4 border-pink-300 shadow-md"
             />
-            <h3 className="font-bold text-lg">ID: {b.biodataId}</h3>
-            <p className="capitalize">Type: {b.biodataType}</p>
-            <p>Division: {b.permanentDivision}</p>
-            <p>Age: {b.age}</p>
-            <p>Occupation: {b.occupation}</p>
+
+            <h3 className="font-bold text-lg text-[#E91E63]">
+              ID: {b.biodataId}
+            </h3>
+            <p className="capitalize text-gray-600">
+              Type: {b.biodataType}
+            </p>
+            <p className="text-gray-600">
+              Division: {b.permanentDivision}
+            </p>
+            <p className="text-gray-600">Age: {b.age}</p>
+            <p className="text-gray-600 mb-3">
+              Occupation: {b.occupation}
+            </p>
+
             <Link to={`/biodata/${b._id}`}>
-              <button className="mt-3 bg-pink-500 text-white px-4 py-1 rounded hover:bg-pink-600">
+              <motion.button
+                whileHover={{ scale: 1.08 }}
+                className="bg-[#E91E63] text-white px-5 py-1.5 rounded-full
+                           shadow hover:bg-pink-700 transition-colors"
+              >
                 View Profile
-              </button>
+              </motion.button>
             </Link>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
