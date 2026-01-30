@@ -34,7 +34,9 @@ const HowItWorks = () => {
             <p className="text-gray-700">
               Send requests, chat securely, and take the next step towards marriage.
             </p>
+            
           </div>
+          
         </div>
       </div>
     </div>

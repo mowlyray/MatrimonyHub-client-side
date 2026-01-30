@@ -145,7 +145,7 @@ const Biodatas = () => {
       </motion.div>
 
       {/* 🔥 BIODATA CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10 w-full">
         {displayData.map((b, index) => (
           <motion.div
             key={b._id}
