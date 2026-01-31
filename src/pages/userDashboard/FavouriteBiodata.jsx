@@ -9,9 +9,6 @@ const FavouriteBiodata = () => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
 
-  /* =========================
-     LOAD FAVOURITES
-  ========================== */
   const {
     data: favourites = [],
     isLoading,
@@ -27,9 +24,6 @@ const FavouriteBiodata = () => {
     },
   });
 
-  /* =========================
-     DELETE FAVOURITE
-  ========================== */
   const deleteMutation = useMutation({
     mutationFn: async (biodataId) => {
       return axiosSecure.delete(
@@ -52,58 +46,77 @@ const FavouriteBiodata = () => {
     deleteMutation.mutate(biodataId);
   };
 
-  if (isLoading) return <p>Loading favourites...</p>;
+  if (isLoading)
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <span className="loading loading-bars loading-lg text-[#E91E63]"></span>
+      </div>
+    );
 
   if (isError)
-    return <p className="text-center">Failed to load favourites</p>;
+    return (
+      <p className="text-center text-red-500">
+        Failed to load favourites
+      </p>
+    );
 
   if (favourites.length === 0)
     return (
-      <p className="text-center">
+      <p className="text-center text-gray-500 italic">
         You have no favourite biodata saved...
       </p>
     );
 
   return (
-    <div className="max-w-5xl mx-auto p-4">
-      <h2 className="text-3xl font-bold mb-6 text-center text-[#E91E63]">
-        ⭐ My Favourite Biodata
+    <div className="max-w-6xl mx-auto p-6 bg-gradient-to-br from-pink-50 via-rose-50 to-white min-h-screen">
+      <h2 className="text-3xl font-extrabold mb-6 text-center text-[#E91E63] relative">
+        My Favourite Biodata
+        <span className="block w-16 h-1 bg-gradient-to-r from-pink-500 to-rose-500 mx-auto mt-2 rounded-full"></span>
       </h2>
 
-      <table className="w-full border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-pink-100">
-            <th className="border px-4 py-2">Name</th>
-            <th className="border px-4 py-2">Biodata ID</th>
-            <th className="border px-4 py-2">Permanent Address</th>
-            <th className="border px-4 py-2">Occupation</th>
-            <th className="border px-4 py-2">Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {favourites.map((f) => (
-            <tr key={f.biodataId} className="hover:bg-pink-50">
-              <td className="border px-4 py-2">{f.name}</td>
-              <td className="border px-4 py-2">{f.biodataId}</td>
-              <td className="border px-4 py-2">
-                {f.permanentDivision}
-              </td>
-              <td className="border px-4 py-2">
-                {f.occupation}
-              </td>
-              <td className="border px-4 py-2 text-center">
-                <button
-                  onClick={() => handleDelete(f.biodataId)}
-                  className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded"
-                >
-                  Delete
-                </button>
-              </td>
+      <div className="overflow-x-auto bg-white rounded-2xl shadow-xl border border-pink-200">
+        <table className="w-full border-collapse">
+          <thead className="bg-gradient-to-r from-pink-500 to-rose-500 text-white">
+            <tr>
+              <th className="py-3 px-4 border-r border-pink-300">Name</th>
+              <th className="py-3 px-4 border-r border-pink-300">Biodata ID</th>
+              <th className="py-3 px-4 border-r border-pink-300">Permanent Address</th>
+              <th className="py-3 px-4 border-r border-pink-300">Occupation</th>
+              <th className="py-3 px-4">Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {favourites.map((f) => (
+              <tr
+                key={f.biodataId}
+                className="text-center border-t border-pink-200 hover:bg-pink-50 transition"
+              >
+                <td className="py-3 px-4 border-r border-pink-200 text-gray-700 font-medium">
+                  {f.name}
+                </td>
+                <td className="py-3 px-4 border-r border-pink-200 text-gray-600">
+                  {f.biodataId}
+                </td>
+                <td className="py-3 px-4 border-r border-pink-200 text-gray-600">
+                  {f.permanentDivision}
+                </td>
+                <td className="py-3 px-4 border-r border-pink-200 text-gray-600">
+                  {f.occupation}
+                </td>
+                <td className="py-3 px-4">
+                  <button
+                    onClick={() => handleDelete(f.biodataId)}
+                    className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-4 py-1.5 rounded-full shadow transition"
+                  >
+                    Remove
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

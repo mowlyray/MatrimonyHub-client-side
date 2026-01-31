@@ -9,9 +9,6 @@ const MyContactRequest = () => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
 
-  /* =========================
-     LOAD CONTACT REQUESTS
-  ========================== */
   const { data: requests = [] } = useQuery({
     queryKey: ["my-contact-requests", user?.email],
     enabled: !!user?.email,
@@ -23,9 +20,6 @@ const MyContactRequest = () => {
     },
   });
 
-  /* =========================
-     DELETE REQUEST
-  ========================== */
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
       return axiosSecure.delete(`/api/contact-request/${id}`);
@@ -41,48 +35,93 @@ const MyContactRequest = () => {
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">My Contact Requests</h2>
+    <div className="p-6 bg-gradient-to-br from-pink-50 via-rose-50 to-white min-h-screen">
+      <h2 className="text-3xl font-extrabold mb-6 text-[#E91E63] text-center">
+        My Contact Requests
+      </h2>
 
-      <table className="w-full border">
-        <thead className="bg-pink-100">
-          <tr>
-            <th>Name</th>
-            <th>Biodata ID</th>
-            <th>Status</th>
-            <th>Mobile</th>
-            <th>Email</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {requests.map((r) => (
-            <tr key={r._id} className="text-center border-t">
-              <td>{r.name || "N/A"}</td>
-              <td>{r.biodataId}</td>
-              <td
-                className={
-                  r.status === "approved"
-                    ? "text-green-600"
-                    : "text-orange-500"
-                }
-              >
-                {r.status}
-              </td>
-              <td>{r.status === "approved" ? r.mobile : "—"}</td>
-              <td>{r.status === "approved" ? r.email : "—"}</td>
-              <td>
-                <button
-                  onClick={() => handleDelete(r._id)}
-                  className="bg-red-500 text-white px-2 py-1 rounded"
-                >
-                  Delete
-                </button>
-              </td>
+      <div className="overflow-x-auto bg-white rounded-2xl shadow-xl border border-pink-300">
+        <table className="w-full border-collapse">
+          <thead className="bg-gradient-to-r from-pink-500 to-rose-500 text-white">
+            <tr>
+              <th className="py-3 px-4 border border-pink-300">Name</th>
+              <th className="py-3 px-4 border border-pink-300">Biodata ID</th>
+              <th className="py-3 px-4 border border-pink-300">Status</th>
+              <th className="py-3 px-4 border border-pink-300">Mobile</th>
+              <th className="py-3 px-4 border border-pink-300">Email</th>
+              <th className="py-3 px-4 border border-pink-300">Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {requests.map((r) => (
+              <tr
+                key={r._id}
+                className="text-center hover:bg-pink-50 transition"
+              >
+                <td className="py-3 px-4 border border-pink-200 text-gray-700 font-medium">
+                  {r.name || "N/A"}
+                </td>
+
+                <td className="py-3 px-4 border border-pink-200 text-gray-600">
+                  {r.biodataId}
+                </td>
+
+                <td
+                  className={`py-3 px-4 border border-pink-200 font-semibold ${
+                    r.status === "approved"
+                      ? "text-green-600"
+                      : "text-orange-500"
+                  }`}
+                >
+                  {r.status}
+                </td>
+
+                <td className="py-3 px-4 border border-pink-200">
+                  {r.status === "approved" ? (
+                    <span className="text-gray-700">{r.mobile}</span>
+                  ) : (
+                    <span className="italic text-gray-400">Hidden</span>
+                  )}
+                </td>
+
+                <td className="py-3 px-4 border border-pink-200">
+                  {r.status === "approved" ? (
+                    <span className="text-gray-700">{r.email}</span>
+                  ) : (
+                    <span className="italic text-gray-400">Hidden</span>
+                  )}
+                </td>
+
+                <td className="py-3 px-4 border border-pink-200">
+                  <button
+                    onClick={() => handleDelete(r._id)}
+                    className="
+                      bg-gradient-to-r from-rose-400 to-pink-500
+                      hover:from-rose-500 hover:to-pink-600
+                      text-white px-4 py-1.5 rounded-full
+                      shadow-md hover:shadow-lg transition
+                    "
+                  >
+                    Remove
+                  </button>
+                </td>
+              </tr>
+            ))}
+
+            {requests.length === 0 && (
+              <tr>
+                <td
+                  colSpan="6"
+                  className="py-10 text-center text-gray-400 italic border border-pink-200"
+                >
+                  No contact requests found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
