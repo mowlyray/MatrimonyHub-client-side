@@ -14,7 +14,7 @@ const ContactUs = () => {
     },
     {
       icon: <MdLocationOn className="text-pink-600 text-2xl" />,
-      text: "Sylhet, Sibganj 3, Bangladesh",
+      text: "Sylhet, Shibganj 3, Bangladesh",
     },
   ];
 

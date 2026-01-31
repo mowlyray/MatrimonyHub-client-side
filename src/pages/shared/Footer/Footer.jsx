@@ -41,7 +41,7 @@ const Footer = () => {
           <h3 className="text-lg font-semibold mb-3 text-[#AD1457]">Contact Info</h3>
           <p className="text-sm">Email: support@matrimonyhub.com</p>
           <p className="text-sm">Phone: +880 1234-567890</p>
-          <p className="text-sm">Address: Dhaka, Bangladesh</p>
+          <p className="text-sm">Address: Sylhet, Bangladesh</p>
 
           {/* Social Icons */}
           <div className="flex gap-4 mt-5">
