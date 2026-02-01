@@ -10,7 +10,11 @@ const DashboardLayout = () => {
   const [role, setRole] = useState("");
   const axiosSecure = useAxiosSecure();
 
-  // 🔥 ROLE FETCH (TanStack Query)
+  const navLinkStyle = ({ isActive }) =>
+    isActive
+      ? "bg-pink-100 text-pink-700 px-3 py-2 rounded font-semibold"
+      : "px-3 py-2 rounded hover:bg-gray-100";
+
   useQuery({
     queryKey: ["userRole", user?.email],
     enabled: !!user?.email,
@@ -37,18 +41,25 @@ const DashboardLayout = () => {
           Matrimony<span className="text-[#AD1457]">Hub</span>
         </Link>
 
-        <nav className="flex flex-col gap-4 mt-10 text-base font-medium">
+        <nav className="flex flex-col gap-2 mt-10 text-base font-medium">
           {user && role !== "admin" && (
             <>
-              <NavLink to="/dashboard/edit-biodata">✏️ Edit Biodata</NavLink>
-              <NavLink to="/dashboard/view-biodata">👁️ View Biodata</NavLink>
-              <NavLink to="/dashboard/my-contact-requests">
+              <NavLink to="/dashboard/edit-biodata" className={navLinkStyle}>
+                ✏️ Edit Biodata
+              </NavLink>
+              <NavLink to="/dashboard/view-biodata" className={navLinkStyle}>
+                👁️ View Biodata
+              </NavLink>
+              <NavLink
+                to="/dashboard/my-contact-requests"
+                className={navLinkStyle}
+              >
                 📬 My Contact Requests
               </NavLink>
-              <NavLink to="/dashboard/favourites">
+              <NavLink to="/dashboard/favourites" className={navLinkStyle}>
                 ❤️ Favourites Biodata
               </NavLink>
-              <NavLink to="/dashboard/got-married">
+              <NavLink to="/dashboard/got-married" className={navLinkStyle}>
                 💍 Got Married
               </NavLink>
             </>
@@ -56,19 +67,34 @@ const DashboardLayout = () => {
 
           {user && role === "admin" && (
             <>
-              <NavLink to="/dashboard/admindashboard">
+              <NavLink
+                to="/dashboard/admindashboard"
+                className={navLinkStyle}
+              >
                 Admin DashBoard
               </NavLink>
-              <NavLink to="/dashboard/manageUsers">
+              <NavLink
+                to="/dashboard/manageUsers"
+                className={navLinkStyle}
+              >
                 Manage Users
               </NavLink>
-              <NavLink to="/dashboard/approvedPremium">
+              <NavLink
+                to="/dashboard/approvedPremium"
+                className={navLinkStyle}
+              >
                 ApprovedPremium
               </NavLink>
-              <NavLink to="/dashboard/approvedContactRequest">
+              <NavLink
+                to="/dashboard/approvedContactRequest"
+                className={navLinkStyle}
+              >
                 Approved Contact Request
               </NavLink>
-              <NavLink to="/dashboard/success-stories">
+              <NavLink
+                to="/dashboard/success-stories"
+                className={navLinkStyle}
+              >
                 💍 Success Stories
               </NavLink>
             </>
@@ -76,7 +102,7 @@ const DashboardLayout = () => {
 
           <NavLink
             to="/"
-            className="mt-6 flex items-center gap-2 text-red-500 hover:text-red-600"
+            className="mt-6 flex items-center gap-2 text-red-500 hover:text-red-600 px-3 py-2"
           >
             <LogOut className="w-4 h-4" /> Logout
           </NavLink>
