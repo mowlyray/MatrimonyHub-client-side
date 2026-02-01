@@ -12,8 +12,8 @@ const DashboardLayout = () => {
 
   const navLinkStyle = ({ isActive }) =>
     isActive
-      ? "bg-pink-100 text-pink-700 px-3 py-2 rounded font-semibold"
-      : "px-3 py-2 rounded hover:bg-gray-100";
+      ? "bg-pink-100 text-pink-700 px-4 py-2 rounded-lg font-semibold shadow-inner"
+      : "px-4 py-2 rounded-lg hover:bg-pink-50 transition-all duration-200";
 
   useQuery({
     queryKey: ["userRole", user?.email],
@@ -23,9 +23,7 @@ const DashboardLayout = () => {
       const match = res.data.find(
         (param) => param.email === user.email
       );
-      if (match) {
-        setRole(match.Role);
-      }
+      if (match) setRole(match.Role);
       return match?.Role;
     },
   });
@@ -33,15 +31,15 @@ const DashboardLayout = () => {
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md p-6 border-r border-gray-200">
+      <aside className="w-72 bg-white shadow-lg rounded-tr-3xl rounded-br-3xl p-6 border-r border-gray-200 flex flex-col">
         <Link
           to="/"
-          className="text-2xl font-bold mt-5 text-[#E91E63] mb-6 tracking-wide"
+          className="text-2xl font-bold text-[#E91E63] mb-8 tracking-wide hover:text-[#AD1457] transition-colors"
         >
           Matrimony<span className="text-[#AD1457]">Hub</span>
         </Link>
 
-        <nav className="flex flex-col gap-2 mt-10 text-base font-medium">
+        <nav className="flex flex-col gap-3 text-base font-medium">
           {user && role !== "admin" && (
             <>
               <NavLink to="/dashboard/edit-biodata" className={navLinkStyle}>
@@ -71,25 +69,25 @@ const DashboardLayout = () => {
                 to="/dashboard/admindashboard"
                 className={navLinkStyle}
               >
-                Admin DashBoard
+                🏠 Admin Dashboard
               </NavLink>
               <NavLink
                 to="/dashboard/manageUsers"
                 className={navLinkStyle}
               >
-                Manage Users
+                👥 Manage Users
               </NavLink>
               <NavLink
                 to="/dashboard/approvedPremium"
                 className={navLinkStyle}
               >
-                ApprovedPremium
+                ⭐ Approved Premium
               </NavLink>
               <NavLink
                 to="/dashboard/approvedContactRequest"
                 className={navLinkStyle}
               >
-                Approved Contact Request
+                📩 Approved Contact Request
               </NavLink>
               <NavLink
                 to="/dashboard/success-stories"
@@ -102,7 +100,7 @@ const DashboardLayout = () => {
 
           <NavLink
             to="/"
-            className="mt-6 flex items-center gap-2 text-red-500 hover:text-red-600 px-3 py-2"
+            className="mt-auto flex items-center gap-2 text-red-500 hover:text-red-600 px-4 py-2 rounded-lg transition-all duration-200 shadow-sm"
           >
             <LogOut className="w-4 h-4" /> Logout
           </NavLink>
@@ -110,7 +108,7 @@ const DashboardLayout = () => {
       </aside>
 
       {/* Content Area */}
-      <main className="flex-1 bg-rose-100 p-6 overflow-y-auto">
+      <main className="flex-1 bg-gradient-to-br from-rose-50 via-rose-100 to-white p-8 overflow-y-auto rounded-l-3xl shadow-inner">
         <Outlet />
       </main>
     </div>
