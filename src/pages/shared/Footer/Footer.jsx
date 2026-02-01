@@ -7,7 +7,7 @@ import linkdinimg from '../../../assets/linkedIn.png';
 
 const Footer = () => {
   return (
-    <footer className="bg-[#FCE4EC] text-[#880E4F] py-10 px-6 border-t border-[#F8BBD0]">
+    <footer className="bg-[#FCE4EC] text-[#880E4F] py-10 px-6 border-t border-[#F8BBD0] relative">
       <div className="w-[90%] mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
 
         {/* Logo & Description */}
@@ -59,9 +59,25 @@ const Footer = () => {
       </div>
 
       {/* Copyright */}
-      <div className="text-center text-sm text-[#C2185B] mt-10">
+      <div className="text-center text-sm text-[#C2185B] mt-10 relative">
         © {new Date().getFullYear()} MatrimonyHub. All rights reserved.
+
+        {/* Animated line below */}
+        <div className="mt-2 h-1 w-full max-w-xs mx-auto rounded-full overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#E91E63] via-[#AD1457] to-[#E91E63] animate-line-slide"></div>
+        </div>
       </div>
+
+      <style>{`
+        @keyframes line-slide {
+          0% { transform: translateX(-100%); }
+          50% { transform: translateX(0%); }
+          100% { transform: translateX(100%); }
+        }
+        .animate-line-slide {
+          animation: line-slide 2s linear infinite;
+        }
+      `}</style>
     </footer>
   );
 };
