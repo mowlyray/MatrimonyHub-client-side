@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+/* Remove SVG focus outline (Recharts / charts fix) */
+svg:focus,
+svg:active,
+svg *:focus,
+svg *:active {
+  outline: none !important;
+}

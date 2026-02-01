@@ -64,7 +64,7 @@ const ViewBiodata = () => {
   ========================== */
   if (isLoading) {
     return (
-      <p className="text-center mt-20 text-gray-500 text-lg">
+      <p className="text-center mt-20 text-pink-500 font-semibold animate-pulse text-lg">
         Loading your biodata...
       </p>
     );

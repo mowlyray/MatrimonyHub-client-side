@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { AuthContext } from "../../context/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { motion } from "framer-motion";
 
 const FavouriteBiodata = () => {
   const { user } = useContext(AuthContext);
@@ -17,25 +18,18 @@ const FavouriteBiodata = () => {
     queryKey: ["favourite-biodata", user?.email],
     enabled: !!user?.email,
     queryFn: async () => {
-      const res = await axiosSecure.get(
-        `/favouritebio/${user.email}`
-      );
+      const res = await axiosSecure.get(`/favouritebio/${user.email}`);
       return res.data;
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (biodataId) => {
-      return axiosSecure.delete(
-        `/favouritebio/${user.email}/${biodataId}`
-      );
+      return axiosSecure.delete(`/favouritebio/${user.email}/${biodataId}`);
     },
     onSuccess: () => {
       toast.success("Favourite removed");
-      queryClient.invalidateQueries([
-        "favourite-biodata",
-        user.email,
-      ]);
+      queryClient.invalidateQueries(["favourite-biodata", user.email]);
     },
     onError: () => {
       toast.error("Failed to delete favourite");
@@ -60,11 +54,26 @@ const FavouriteBiodata = () => {
       </p>
     );
 
+  // ✅ No favourites UI (updated)
   if (favourites.length === 0)
     return (
-      <p className="text-center text-gray-500 italic">
-        You have no favourite biodata saved...
-      </p>
+      <div className="min-h-screen flex flex-col justify-center items-center">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-pink-50 border border-pink-200 rounded-2xl p-10 shadow-lg text-center max-w-md"
+        >
+          <h2 className="text-2xl font-bold text-pink-600 mb-2">
+            No Favourite Biodata
+          </h2>
+          <p className="text-gray-600 italic">
+            You have not saved any favourite biodata yet.
+          </p>
+          <div className="mt-4">
+            <span className="inline-block w-20 h-1 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full"></span>
+          </div>
+        </motion.div>
+      </div>
     );
 
   return (
