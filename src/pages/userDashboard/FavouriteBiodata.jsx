@@ -42,8 +42,10 @@ const FavouriteBiodata = () => {
 
   if (isLoading)
     return (
-      <div className="min-h-screen flex justify-center items-center">
-        <span className="loading loading-bars loading-lg text-[#E91E63]"></span>
+    <div className="min-h-[60vh] flex justify-center items-center">
+        <p className="text-pink-500 font-semibold animate-pulse">
+          Loading Favouritebiodata...
+        </p>
       </div>
     );
 
@@ -54,7 +56,7 @@ const FavouriteBiodata = () => {
       </p>
     );
 
-  //  No favourites UI (updated)
+  //  No favourites UI
   if (favourites.length === 0)
     return (
       <div className="min-h-screen flex flex-col justify-center items-center">

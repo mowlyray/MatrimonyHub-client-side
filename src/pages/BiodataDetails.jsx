@@ -47,7 +47,7 @@ const BiodataDetails = () => {
     },
   });
 
-  if (isLoading) return <p className="text-center py-10">Loading biodata...</p>;
+  if (isLoading) return <p className="text-center py-10 text-pink-500 font-semibold">Loading biodata...</p>;
   if (error || !biodataRes?.biodata) return <p className="text-center py-10">Biodata not found</p>;
 
   const { biodata, canSeeContact } = biodataRes;

@@ -26,7 +26,7 @@ const SuccessCounter = () => {
   if (isLoading) {
     return (
       <div className="py-16 bg-pink-50 text-center">
-        <p className="text-gray-500">Loading statistics...</p>
+        <p className="text-pink-500 font-semibold-gray-500">Loading statistics...</p>
       </div>
     );
   }

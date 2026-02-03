@@ -56,7 +56,7 @@ const Biodatas = () => {
   if (isLoading) {
     return (
       <div className="py-24 bg-gradient-to-br from-rose-50 via-pink-50 to-white text-center">
-        <p className="text-gray-500 animate-pulse text-lg">
+        <p className="text-pink-500 font-semibold animate-pulse text-lg">
           Loading biodatas...
         </p>
       </div>
@@ -65,7 +65,7 @@ const Biodatas = () => {
 
   const dataSource = isFiltered ? filtered : biodatas;
 
-  // 🔹 pagination logic
+  //  pagination logic
   const totalPages = Math.ceil(dataSource.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const displayData = dataSource.slice(

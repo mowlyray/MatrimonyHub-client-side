@@ -89,7 +89,7 @@ const CheckoutForm = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">Preparing payment...</p>
+        <p className="text-pink-500 font-semibold">Preparing payment...</p>
       </div>
     );
   }
