@@ -16,7 +16,7 @@ const AdminSuccessStories = () => {
     },
   });
 
-  // 🔒 Disable background scroll when modal open
+  // Disable background scroll when modal open
   useEffect(() => {
     document.body.style.overflow = selectedStory ? "hidden" : "auto";
   }, [selectedStory]);

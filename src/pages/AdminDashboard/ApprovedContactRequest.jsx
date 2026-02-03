@@ -7,9 +7,7 @@ const ApprovedContactRequest = () => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
 
-  /* =========================
-     GET ALL CONTACT REQUESTS
-  ========================== */
+  /* GET ALL CONTACT REQUESTS */
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["contactRequests"],
     queryFn: async () => {
@@ -18,9 +16,7 @@ const ApprovedContactRequest = () => {
     },
   });
 
-  /* =========================
-     APPROVE REQUEST
-  ========================== */
+  /*  APPROVE REQUEST */
   const approveMutation = useMutation({
     mutationFn: async (id) => {
       return axiosSecure.patch(`/api/contact-request/approve/${id}`);

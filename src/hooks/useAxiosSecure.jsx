@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import { AuthContext } from "../context/AuthContext";
 
 const axiosSecure = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: "https://matrimony-hub-server-side.vercel.app/",
 });
 
 const useAxiosSecure = () => {
@@ -40,7 +40,6 @@ const useAxiosSecure = () => {
       }
     );
 
-    // CLEANUP (important)
     return () => {
       axiosSecure.interceptors.request.eject(requestInterceptor);
       axiosSecure.interceptors.response.eject(responseInterceptor);

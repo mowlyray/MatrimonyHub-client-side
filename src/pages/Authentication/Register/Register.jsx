@@ -12,7 +12,7 @@ import { AuthContext } from '../../../context/AuthContext';
 
 const Register = () => {
 
-     const {createUser, setUser,  updateUser} = use(AuthContext);
+    const {createUser, setUser,  updateUser} = use(AuthContext);
    const [nameError, setNameError] = useState("");
    const [passwordError, setPasswordError] = useState("");
    const { signInWithGoogle } = use(AuthContext);

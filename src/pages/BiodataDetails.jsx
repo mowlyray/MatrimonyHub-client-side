@@ -12,9 +12,7 @@ const BiodataDetails = () => {
   const { user } = useContext(AuthContext);
   const axiosSecure = useAxiosSecure();
 
-  /* =========================
-     🔹 BIODATA DETAILS QUERY
-  ========================== */
+  /* BIODATA DETAILS QUERY */
   const {
     data: biodataRes,
     isLoading,
@@ -30,9 +28,7 @@ const BiodataDetails = () => {
     },
   });
 
-  /* =========================
-     🔹 FAVOURITES QUERY
-  ========================== */
+  /* FAVOURITES QUERY */
   const { data: favourites = [] } = useQuery({
     queryKey: ["favourites", user?.email],
     enabled: !!user?.email,
@@ -42,9 +38,7 @@ const BiodataDetails = () => {
     },
   });
 
-  /* =========================
-     🔹 ALL BIODATAS (SIMILAR)
-  ========================== */
+  /* ALL BIODATAS (SIMILAR) */
   const { data: allBiodatas = [] } = useQuery({
     queryKey: ["all-biodatas"],
     queryFn: async () => {
@@ -63,9 +57,7 @@ const BiodataDetails = () => {
     .slice(0, 3);
   const isOwnBiodata = biodata.email === user.email;
 
-  /* =========================
-     🔹 ACTIONS
-  ========================== */
+  /*  ACTIONS */
   const handleAddToFavourites = async () => {
     try {
       await axiosSecure.post("/favouritebio", {

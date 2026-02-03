@@ -26,7 +26,7 @@ const DashboardRedirect = () => {
     },
   });
 
-  if (!role) return null; // loading চাইলে এখানে spinner দিতে পারো
+  if (!role) return null;
 
   return role === "admin" ? (
     <Navigate to="/dashboard/admindashboard" replace />

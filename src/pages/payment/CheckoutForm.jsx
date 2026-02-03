@@ -16,9 +16,7 @@ const CheckoutForm = () => {
 
   const [processing, setProcessing] = useState(false);
 
-  /* ===============================
-     CREATE PAYMENT INTENT (QUERY)
-  =============================== */
+  /*   CREATE PAYMENT INTENT (QUERY) */
   const { data, isLoading } = useQuery({
     queryKey: ["create-payment-intent"],
     queryFn: async () => {
@@ -32,9 +30,7 @@ const CheckoutForm = () => {
 
   const clientSecret = data?.clientSecret;
 
-  /* ===============================
-     CONTACT REQUEST (MUTATION)
-  =============================== */
+  /* CONTACT REQUEST (MUTATION) */
   const contactRequestMutation = useMutation({
     mutationFn: async (paymentIntent) => {
       return axiosSecure.post("/api/contact-request", {
@@ -56,9 +52,7 @@ const CheckoutForm = () => {
     },
   });
 
-  /* ===============================
-     HANDLE SUBMIT
-  =============================== */
+  /* HANDLE SUBMIT */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!stripe || !elements || !clientSecret) return;

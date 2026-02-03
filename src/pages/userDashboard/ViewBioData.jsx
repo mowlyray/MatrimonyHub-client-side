@@ -11,9 +11,7 @@ const ViewBiodata = () => {
 
   const [showModal, setShowModal] = useState(false);
 
-  /* =========================
-     LOAD BIODATA
-  ========================== */
+  /* LOAD BIODATA */
   const {
     data: biodata,
     isLoading,
@@ -29,9 +27,7 @@ const ViewBiodata = () => {
     },
   });
 
-  /* =========================
-     PREMIUM REQUEST
-  ========================== */
+  /*  PREMIUM REQUEST */
   const premiumMutation = useMutation({
     mutationFn: async () => {
       return axiosSecure.patch(
@@ -41,7 +37,7 @@ const ViewBiodata = () => {
     onSuccess: (res) => {
       toast.success(res.data.message || "Premium request sent to admin");
 
-      // ✅ client-side update (same behavior as before)
+      // client-side update 
       setData?.((old) => ({
         ...old,
         premiumRequested: true,
@@ -59,9 +55,7 @@ const ViewBiodata = () => {
     premiumMutation.mutate();
   };
 
-  /* =========================
-     LOADING STATE
-  ========================== */
+  /*  LOADING STATE */
   if (isLoading) {
     return (
       <p className="text-center mt-20 text-pink-500 font-semibold animate-pulse text-lg">
@@ -70,9 +64,7 @@ const ViewBiodata = () => {
     );
   }
 
-  /* =========================
-     NO BIODATA FOUND
-  ========================== */
+  /* NO BIODATA FOUND */
   if (!biodata) {
     return (
       <div className="max-w-xl mx-auto mt-20 bg-white p-10 rounded-2xl shadow-lg text-center">
@@ -97,9 +89,7 @@ const ViewBiodata = () => {
     );
   }
 
-  /* =========================
-      VIEW BIODATA
-  ========================== */
+  /*  VIEW BIODATA */
   return (
     <div className="max-w-6xl mx-auto p-6">
       <h2 className="text-4xl font-semibold text-center mb-8 text-pink-600">

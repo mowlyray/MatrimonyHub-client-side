@@ -9,9 +9,7 @@ const ManageUsers = () => {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
 
-  /* =========================
-     FETCH USERS
-  ========================== */
+  /* FETCH USERS */
   const { data: users = [], isLoading } = useQuery({
     queryKey: ["users", search],
     queryFn: async () => {
@@ -20,9 +18,7 @@ const ManageUsers = () => {
     },
   });
 
-  /* =========================
-     MAKE ADMIN
-  ========================== */
+  /*  MAKE ADMIN */
   const makeAdminMutation = useMutation({
     mutationFn: async (id) =>
       axiosSecure.put(`/users/${id}`, { role: "admin" }),
@@ -46,9 +42,7 @@ const ManageUsers = () => {
     }
   };
 
-  /* =========================
-     MAKE PREMIUM
-  ========================== */
+  /*  MAKE PREMIUM */
   const makePremiumMutation = useMutation({
     mutationFn: async (id) =>
       axiosSecure.patch(`/api/admin/approve-premium/${id}`),
@@ -71,9 +65,7 @@ const ManageUsers = () => {
     }
   };
 
-  /* =========================
-     SEARCH
-  ========================== */
+  /*   SEARCH */
   const handleSearch = (e) => {
     e.preventDefault();
     queryClient.invalidateQueries(["users"]);

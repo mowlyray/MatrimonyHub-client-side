@@ -25,9 +25,7 @@ const EditBiodata = () => {
   const navigate = useNavigate();
   const axiosSecure = useAxiosSecure();
 
-  /* ===============================
-     LOAD USER BIODATA
-  =============================== */
+  /* LOAD USER BIODATA */
   const { isLoading } = useQuery({
     queryKey: ["my-biodata", user?.email],
     enabled: !!user?.email,
@@ -42,9 +40,7 @@ const EditBiodata = () => {
     },
   });
 
-  /* ===============================
-     CREATE / UPDATE BIODATA
-  =============================== */
+  /*  CREATE / UPDATE BIODATA */
   const biodataMutation = useMutation({
     mutationFn: async (formData) => {
       if (biodataId) {
@@ -96,7 +92,7 @@ const EditBiodata = () => {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-14">
 
-            {/* 👤 PERSONAL INFO */}
+            {/*  PERSONAL INFO */}
             <Section title="👤 Personal Information">
               <Select register={register("biodataType")} options={["Male", "Female"]} placeholder="Select Gender" />
               <Input register={register("name")} placeholder="Full Name" />
@@ -111,20 +107,20 @@ const EditBiodata = () => {
               <Input register={register("motherName")} placeholder="Mother's Name" />
             </Section>
 
-            {/* 📍 LOCATION */}
+            {/*  LOCATION */}
             <Section title="📍 Location Information">
               <Select register={register("permanentDivision")} options={divisions} placeholder="Permanent Division" />
               <Select register={register("presentDivision")} options={divisions} placeholder="Present Division" />
             </Section>
 
-            {/* 💕 PARTNER */}
+            {/*  PARTNER */}
             <Section title="💕 Partner Preferences">
               <Input register={register("expectedPartnerAge")} type="number" placeholder="Expected Partner Age" />
               <Select register={register("expectedPartnerHeight")} options={heights} placeholder="Expected Height" />
               <Select register={register("expectedPartnerWeight")} options={weights} placeholder="Expected Weight" />
             </Section>
 
-            {/* 📞 CONTACT */}
+            {/*  CONTACT */}
             <Section title="📞 Contact Information">
               <input value={user.email} readOnly className="input bg-gray-100" />
 

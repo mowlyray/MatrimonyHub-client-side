@@ -17,7 +17,7 @@ const GotMarried = () => {
     setValue("rating", value);
   };
 
-  // 🔥 TANSTACK QUERY MUTATION
+  // TANSTACK QUERY MUTATION
   const { mutateAsync, isLoading } = useMutation({
     mutationFn: async (storyData) => {
       const res = await axiosSecure.post("/api/success-story", storyData);
@@ -56,7 +56,7 @@ const GotMarried = () => {
     await mutateAsync({
       ...data,
       rating,
-      userEmail: user.email, // 🔒 server verify করবে
+      userEmail: user.email,  
     });
   };
 
@@ -85,7 +85,7 @@ const GotMarried = () => {
           className="input"
         />
 
-        {/* ⭐ STAR RATING */}
+        {/*  STAR RATING */}
         <div>
           <p className="mb-2 font-medium text-gray-700">Your Rating</p>
           <div className="flex gap-2 text-2xl cursor-pointer">

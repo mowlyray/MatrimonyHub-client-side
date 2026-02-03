@@ -11,9 +11,9 @@ const Biodatas = () => {
   const [filtered, setFiltered] = useState([]);
   const [isFiltered, setIsFiltered] = useState(false);
 
-  // 🔹 pagination state
+  // pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // ✅ 10 biodata per page
+  const itemsPerPage = 10; 
 
   const [filters, setFilters] = useState({
     ageRange: [18, 25],
@@ -75,7 +75,7 @@ const Biodatas = () => {
 
   return (
     <div className="flex gap-8 p-8 bg-gradient-to-br from-rose-50 via-pink-50 to-white min-h-screen">
-      {/* 🔥 FILTER SIDEBAR */}
+      {/* FILTER SIDEBAR */}
       <motion.div
         initial={{ x: -30, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
@@ -141,7 +141,7 @@ const Biodatas = () => {
         </button>
       </motion.div>
 
-      {/* 🔥 BIODATA CARDS */}
+      {/*  BIODATA CARDS */}
       <div className="w-full">
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
           {displayData.map((b, index) => (
@@ -174,7 +174,7 @@ const Biodatas = () => {
           ))}
         </div>
 
-        {/* 🔹 PAGINATION */}
+        {/*  PAGINATION */}
         <div className="flex justify-center gap-2">
           <button
             disabled={currentPage === 1}
