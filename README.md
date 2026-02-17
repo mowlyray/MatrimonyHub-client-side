@@ -3,19 +3,16 @@
 A full-stack **Matrimony Web Application** built using the **MERN Stack (MongoDB, Express, React, Node.js)**.  
 This platform helps users find suitable life partners through biodata browsing, premium features, contact requests, and success stories.
 
+---
 
 ## 🌐 Live Website
 🔗 https://splendorous-marigold-66d547.netlify.app/
 
+---
+
 ## 🔐 Admin Credentials
 - **Admin Email:** admin@gmail.com  
 - **Admin Password:** Admin123  
-
----
-
-## 📂 GitHub Repositories
-- **Client Side:** https://github.com/mowlyray/MatrimonyHub-client-side 
-- **Server Side:** https://github.com/mowlyray/MatrimonyHub-server-side 
 
 ---
 
